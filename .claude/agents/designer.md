@@ -104,4 +104,8 @@ AskUserQuestion 없이 피드백 루프를 건너뛰는 것은 금지된다.
 - 미적 방향 결정 시 execution/decisions.md에 기록
 - placeholder 처리한 영역은 open-questions.md에 [미결]로 기록
 - 사용자 피드백 내용과 수정 이력은 execution/decisions.md에 기록
+
+**log.md 시간 기록 규칙:**
+execution/log.md에 시간({HH:MM})을 기록할 때 반드시 `date +%H:%M` bash 명령을 실행하여 실제 시스템 시간을 획득한다.
+시스템 프롬프트의 currentDate 값이나 추정 시간을 사용하는 것은 금지된다.
 </Document_Responsibility>
