@@ -78,6 +78,12 @@ export default function App() {
     setDrawMode(mode)
   }
 
+  function handleActiveMode(mode) {
+    resetDrawing()
+    setDrawMode('point')
+    setActiveMode(mode)
+  }
+
   function handleMarkerClick(id) {
     setActiveMarkerId(id)
     setFormState(null)
@@ -138,7 +144,7 @@ export default function App() {
         count={activeMode === 'wishlist' ? wishlistItems.length : obstacles.length}
         onToggleSidebar={() => setIsSidebarOpen((p) => !p)}
         activeMode={activeMode}
-        onModeChange={setActiveMode}
+        onModeChange={handleActiveMode}
       />
       <div className={styles.body}>
         <aside className={`${styles.sidebar} ${isSidebarOpen ? styles.open : ''}`}>
@@ -195,6 +201,7 @@ export default function App() {
           onDrawCancel={handleDrawCancel}
           wishlistItems={wishlistItems}
           onWishlistItemClick={selectWishlistItem}
+          activeMode={activeMode}
         />
 
         <div className={`${styles.bottomSheet} ${isSheetOpen ? styles.sheetOpen : ''}`}>
