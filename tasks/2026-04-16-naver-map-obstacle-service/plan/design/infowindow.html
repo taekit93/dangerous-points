@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>장애물 지도 — InfoWindow 및 마커 상태 모음</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="layout.css" />
+  <link rel="stylesheet" href="components.css" />
+  <style>
+    body {
+      background: var(--color-bg);
+      padding: 32px;
+      height: auto;
+      overflow: auto;
+    }
+    .preview-section { margin-bottom: 48px; }
+    .preview-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--color-text-secondary);
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .preview-row {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+      align-items: flex-start;
+    }
+    .preview-label {
+      font-size: 10px;
+      color: var(--color-text-placeholder);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* 마커 갤러리 */
+    .marker-gallery {
+      display: flex;
+      gap: 32px;
+      align-items: flex-end;
+      flex-wrap: wrap;
+    }
+    .marker-item-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .marker-item-wrap span {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--color-text-secondary);
+    }
+
+    /* 마커 hover 효과 */
+    .map-marker {
+      cursor: pointer;
+      transition: transform 0.15s ease, filter 0.15s ease;
+      display: block;
+    }
+    .map-marker:hover {
+      transform: scale(1.15) translateY(-2px);
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.25));
+    }
+
+    /* 배지 갤러리 */
+    .badge-gallery {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    /* 색상 스와치 */
+    .color-swatch-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, 160px);
+      gap: 12px;
+    }
+    .color-swatch {
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      border: 1px solid var(--color-border);
+    }
+    .color-swatch__block {
+      height: 56px;
+    }
+    .color-swatch__info {
+      padding: 8px 10px;
+      background: var(--color-card);
+    }
+    .color-swatch__name {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+    .color-swatch__hex {
+      font-size: 10px;
+      color: var(--color-text-secondary);
+      font-family: monospace;
+    }
+  </style>
+</head>
+<body>
+
+<h1 style="font-size:20px; font-weight:700; color:var(--color-text-primary); margin-bottom:8px;">
+  InfoWindow · 마커 · 디자인 시스템
+</h1>
+<p style="font-size:13px; color:var(--color-text-secondary); margin-bottom:40px;">
+  마커 색상, InfoWindow 상태, 배지, 색상 팔레트 스냅샷
+</p>
+
+<!-- ═══════════════════════════════════════
+     1. 마커 색상 갤러리
+════════════════════════════════════════ -->
+<section class="preview-section">
+  <p class="preview-title">1. 커스텀 마커 아이콘 — 위험도별 색상</p>
+  <div class="marker-gallery">
+
+    <!-- 위험 마커 -->
+    <div class="marker-item-wrap">
+      <span>위험 (기본)</span>
+      <svg class="map-marker" width="32" height="40" viewBox="0 0 32 40"
+           role="img" aria-label="위험 마커">
+        <path d="M16 0C7.163 0 0 7.163 0 16C0 27 16 40 16 40C16 40 32 27 32 16C32 7.163 24.837 0 16 0Z"
+              fill="#FF4444"/>
+        <circle cx="16" cy="16" r="7" fill="rgba(255,255,255,0.95)"/>
+        <circle cx="16" cy="16" r="3.5" fill="#FF4444"/>
+      </svg>
+    </div>
+
+    <!-- 위험 마커 hover 표시 -->
+    <div class="marker-item-wrap">
+      <span>위험 (hover)</span>
+      <svg style="transform:scale(1.15) translateY(-2px); filter:drop-shadow(0 4px 8px rgba(0,0,0,0.25));"
+           width="32" height="40" viewBox="0 0 32 40"
+           role="img" aria-label="위험 마커 hover">
+        <path d="M16 0C7.163 0 0 7.163 0 16C0 27 16 40 16 40C16 40 32 27 32 16C32 7.163 24.837 0 16 0Z"
+              fill="#FF4444"/>
+        <circle cx="16" cy="16" r="7" fill="rgba(255,255,255,0.95)"/>
+        <circle cx="16" cy="16" r="3.5" fill="#FF4444"/>
+      </svg>
+    </div>
+
+    <!-- 주의 마커 -->
+    <div class="marker-item-wrap">
+      <span>주의 (기본)</span>
+      <svg class="map-marker" width="32" height="40" viewBox="0 0 32 40"
+           role="img" aria-label="주의 마커">
+        <path d="M16 0C7.163 0 0 7.163 0 16C0 27 16 40 16 40C16 40 32 27 32 16C32 7.163 24.837 0 16 0Z"
+              fill="#FFA500"/>
+        <circle cx="16" cy="16" r="7" fill="rgba(255,255,255,0.95)"/>
+        <circle cx="16" cy="16" r="3.5" fill="#FFA500"/>
+      </svg>
+    </div>
+
+    <!-- 안전 마커 -->
+    <div class="marker-item-wrap">
+      <span>안전 (기본)</span>
+      <svg class="map-marker" width="32" height="40" viewBox="0 0 32 40"
+           role="img" aria-label="안전 마커">
+        <path d="M16 0C7.163 0 0 7.163 0 16C0 27 16 40 16 40C16 40 32 27 32 16C32 7.163 24.837 0 16 0Z"
+              fill="#44BB44"/>
+        <circle cx="16" cy="16" r="7" fill="rgba(255,255,255,0.95)"/>
+        <circle cx="16" cy="16" r="3.5" fill="#44BB44"/>
+      </svg>
+    </div>
+
+    <!-- 임시 핀 (클릭 시) -->
+    <div class="marker-item-wrap">
+      <span>임시 핀 (클릭)</span>
+      <svg class="map-marker temp-pin" width="32" height="40" viewBox="0 0 32 40"
+           role="img" aria-label="임시 마커">
+        <path d="M16 0C7.163 0 0 7.163 0 16C0 27 16 40 16 40C16 40 32 27 32 16C32 7.163 24.837 0 16 0Z"
+              fill="#2D3E50" opacity="0.7"/>
+        <circle cx="16" cy="16" r="7" fill="rgba(255,255,255,0.9)"/>
+        <path d="M13 16H19M16 13V19" stroke="#2D3E50" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+  </div>
+
+  <p style="font-size:12px; color:var(--color-text-secondary); margin-top:16px;">
+    SVG 구조: path(핀 외형) + circle(내부 흰 원) + circle(위험도 색상 점)<br/>
+    React 구현 시: dangerLevel prop에 따라 fill 색상을 동적으로 변경
+  </p>
+
+  <details style="margin-top:12px;">
+    <summary style="font-size:12px; font-weight:600; cursor:pointer; color:var(--color-primary);">
+      SVG 마커 소스 코드 보기
+    </summary>
+    <pre style="margin-top:8px; padding:16px; background:var(--color-card);
+                border:1px solid var(--color-border); border-radius:var(--radius-md);
+                font-size:12px; overflow-x:auto; line-height:1.6;"><code>/* React 마커 컴포넌트 예시 */
+const MARKER_COLORS = {
+  '위험': '#FF4444',
+  '주의': '#FFA500',
+  '안전': '#44BB44',
+};
+
+const markerSvg = (dangerLevel) => {
+  const color = MARKER_COLORS[dangerLevel] || '#2D3E50';
+  return `data:image/svg+xml,${encodeURIComponent(`
+    &lt;svg width="32" height="40" viewBox="0 0 32 40" xmlns="http://www.w3.org/2000/svg"&gt;
+      &lt;path d="M16 0C7.163 0 0 7.163 0 16C0 27 16 40 16 40C16 40 32 27 32 16C32 7.163 24.837 0 16 0Z"
+            fill="${color}"/&gt;
+      &lt;circle cx="16" cy="16" r="7" fill="rgba(255,255,255,0.95)"/&gt;
+      &lt;circle cx="16" cy="16" r="3.5" fill="${color}"/&gt;
+    &lt;/svg&gt;
+  `)}`;
+};
+
+// naver.maps.Marker icon 설정
+new naver.maps.Marker({
+  icon: { url: markerSvg(obstacle.dangerLevel), size: new naver.maps.Size(32, 40),
+          anchor: new naver.maps.Point(16, 40) }
+});</code></pre>
+  </details>
+</section>
+
+<!-- ═══════════════════════════════════════
+     2. InfoWindow 상태 모음
+════════════════════════════════════════ -->
+<section class="preview-section">
+  <p class="preview-title">2. InfoWindow 상태 — 위험도별</p>
+  <div class="preview-row">
+
+    <!-- 위험 InfoWindow -->
+    <div>
+      <p class="preview-label">위험 장애물</p>
+      <div style="background:white; border-radius:var(--radius-md); box-shadow:var(--shadow-lg);">
+        <div class="iw-wrap">
+          <button class="iw-close" aria-label="닫기">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2.5" stroke-linecap="round">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+          <div class="iw-badges">
+            <span class="badge badge--category">도로파손</span>
+            <span class="badge badge--danger">위험</span>
+          </div>
+          <p class="iw-title">광화문 앞 도로 파손</p>
+          <p class="iw-desc">왕복 6차선 도로 우측 차선에 30cm 크기의 파손 발생. 야간 운행 시 주의 필요합니다.</p>
+          <p class="iw-date">2026-04-16 등록</p>
+          <div class="iw-actions">
+            <button class="iw-btn iw-btn--edit">수정</button>
+            <button class="iw-btn iw-btn--delete">삭제</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 주의 InfoWindow -->
+    <div>
+      <p class="preview-label">주의 장애물</p>
+      <div style="background:white; border-radius:var(--radius-md); box-shadow:var(--shadow-lg);">
+        <div class="iw-wrap">
+          <button class="iw-close" aria-label="닫기">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2.5" stroke-linecap="round">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+          <div class="iw-badges">
+            <span class="badge badge--category">침수</span>
+            <span class="badge badge--warning">주의</span>
+          </div>
+          <p class="iw-title">종로구 보도블록 침수 지점</p>
+          <p class="iw-desc">우기 시 보도블록 침수 우려. 차량 통행은 가능하나 보행자 주의 요망.</p>
+          <p class="iw-date">2026-04-15 등록</p>
+          <div class="iw-actions">
+            <button class="iw-btn iw-btn--edit">수정</button>
+            <button class="iw-btn iw-btn--delete">삭제</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 안전 InfoWindow (설명 없음) -->
+    <div>
+      <p class="preview-label">안전 (설명 없음)</p>
+      <div style="background:white; border-radius:var(--radius-md); box-shadow:var(--shadow-lg);">
+        <div class="iw-wrap">
+          <button class="iw-close" aria-label="닫기">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2.5" stroke-linecap="round">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+          <div class="iw-badges">
+            <span class="badge badge--category">공사중</span>
+            <span class="badge badge--safe">안전</span>
+          </div>
+          <p class="iw-title">서울시청 인근 공사 구간</p>
+          <!-- 설명 없을 때 iw-desc 미노출 -->
+          <p class="iw-date">2026-04-14 등록</p>
+          <div class="iw-actions">
+            <button class="iw-btn iw-btn--edit">수정</button>
+            <button class="iw-btn iw-btn--delete">삭제</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 긴 제목/설명 -->
+    <div>
+      <p class="preview-label">긴 텍스트 (말줄임)</p>
+      <div style="background:white; border-radius:var(--radius-md); box-shadow:var(--shadow-lg);">
+        <div class="iw-wrap">
+          <button class="iw-close" aria-label="닫기">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2.5" stroke-linecap="round">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+          <div class="iw-badges">
+            <span class="badge badge--category">보행위험</span>
+            <span class="badge badge--danger">위험</span>
+          </div>
+          <p class="iw-title">북악산 방향 등산로 입구에서 100m 지점의 낙석 위험 구간 표시</p>
+          <p class="iw-desc">최근 폭우로 인해 산사태 우려 지역으로 지정. 진입 금지 구역이며 반드시 우회로를 이용해야 하며, 긴급 연락처는 120 또는 119입니다.</p>
+          <p class="iw-date">2026-04-13 등록</p>
+          <div class="iw-actions">
+            <button class="iw-btn iw-btn--edit">수정</button>
+            <button class="iw-btn iw-btn--delete">삭제</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     3. 배지 시스템
+════════════════════════════════════════ -->
+<section class="preview-section">
+  <p class="preview-title">3. 배지 시스템</p>
+  <div style="display:flex; flex-direction:column; gap:16px;">
+    <div>
+      <p style="font-size:12px; font-weight:600; color:var(--color-text-secondary); margin-bottom:8px;">위험도 배지</p>
+      <div class="badge-gallery">
+        <span class="badge badge--danger">위험</span>
+        <span class="badge badge--warning">주의</span>
+        <span class="badge badge--safe">안전</span>
+      </div>
+    </div>
+    <div>
+      <p style="font-size:12px; font-weight:600; color:var(--color-text-secondary); margin-bottom:8px;">카테고리 배지</p>
+      <div class="badge-gallery">
+        <span class="badge badge--category">공사중</span>
+        <span class="badge badge--category">도로파손</span>
+        <span class="badge badge--category">침수</span>
+        <span class="badge badge--category">낙석</span>
+        <span class="badge badge--category">보행위험</span>
+        <span class="badge badge--category">기타</span>
+        <span class="badge badge--category">자전거도로</span>
+      </div>
+    </div>
+    <div>
+      <p style="font-size:12px; font-weight:600; color:var(--color-text-secondary); margin-bottom:8px;">위험도 도트</p>
+      <div class="badge-gallery" style="align-items:center;">
+        <span class="danger-dot danger-dot--danger"></span>
+        <span style="font-size:12px; color:var(--color-text-secondary);">위험 #FF4444</span>
+        <span class="danger-dot danger-dot--warning" style="margin-left:8px;"></span>
+        <span style="font-size:12px; color:var(--color-text-secondary);">주의 #FFA500</span>
+        <span class="danger-dot danger-dot--safe" style="margin-left:8px;"></span>
+        <span style="font-size:12px; color:var(--color-text-secondary);">안전 #44BB44</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     4. 색상 팔레트
+════════════════════════════════════════ -->
+<section class="preview-section">
+  <p class="preview-title">4. 색상 팔레트</p>
+  <div class="color-swatch-grid">
+    <div class="color-swatch">
+      <div class="color-swatch__block" style="background:#2D3E50;"></div>
+      <div class="color-swatch__info">
+        <p class="color-swatch__name">Primary</p>
+        <p class="color-swatch__hex">#2D3E50</p>
+      </div>
+    </div>
+    <div class="color-swatch">
+      <div class="color-swatch__block" style="background:#1A2B3C;"></div>
+      <div class="color-swatch__info">
+        <p class="color-swatch__name">Primary Dark</p>
+        <p class="color-swatch__hex">#1A2B3C</p>
+      </div>
+    </div>
+    <div class="color-swatch">
+      <div class="color-swatch__block" style="background:#FF4444;"></div>
+      <div class="color-swatch__info">
+        <p class="color-swatch__name">Danger</p>
+        <p class="color-swatch__hex">#FF4444</p>
+      </div>
+    </div>
+    <div class="color-swatch">
+      <div class="color-swatch__block" style="background:#FFF0F0; border-bottom:1px solid #E0E0E0;"></div>
+      <div class="color-swatch__info">
+        <p class="color-swatch__name">Danger BG</p>
+        <p class="color-swatch__hex">#FFF0F0</p>
+      </div>
+    </div>
+    <div class="color-swatch">
+      <div class="color-swatch__block" style="background:#FFA500;"></div>
+      <div class="color-swatch__info">
+        <p class="color-swatch__name">Warning</p>
+        <p class="color-swatch__hex">#FFA500</p>
+      </div>
+    </div>
+    <div class="color-swatch">
+      <div class="color-swatch__block" style="background:#FFF8E6; border-bottom:1px solid #E0E0E0;"></div>
+      <div class="color-swatch__info">
+        <p class="color-swatch__name">Warning BG</p>
+        <p class="color-swatch__hex">#FFF8E6</p>
+      </div>
+    </div>
+    <div class="color-swatch">
+      <div class="color-swatch__block" style="background:#44BB44;"></div>
+      <div class="color-swatch__info">
+        <p class="color-swatch__name">Safe</p>
+        <p class="color-swatch__hex">#44BB44</p>
+      </div>
+    </div>
+    <div class="color-swatch">
+      <div class="color-swatch__block" style="background:#F0FFF0; border-bottom:1px solid #E0E0E0;"></div>
+      <div class="color-swatch__info">
+        <p class="color-swatch__name">Safe BG</p>
+        <p class="color-swatch__hex">#F0FFF0</p>
+      </div>
+    </div>
+    <div class="color-swatch">
+      <div class="color-swatch__block" style="background:#F5F7FA; border-bottom:1px solid #E0E0E0;"></div>
+      <div class="color-swatch__info">
+        <p class="color-swatch__name">Background</p>
+        <p class="color-swatch__hex">#F5F7FA</p>
+      </div>
+    </div>
+    <div class="color-swatch">
+      <div class="color-swatch__block" style="background:#FFFFFF; border-bottom:1px solid #E0E0E0;"></div>
+      <div class="color-swatch__info">
+        <p class="color-swatch__name">Card</p>
+        <p class="color-swatch__hex">#FFFFFF</p>
+      </div>
+    </div>
+    <div class="color-swatch">
+      <div class="color-swatch__block" style="background:#E0E0E0;"></div>
+      <div class="color-swatch__info">
+        <p class="color-swatch__name">Border</p>
+        <p class="color-swatch__hex">#E0E0E0</p>
+      </div>
+    </div>
+    <div class="color-swatch">
+      <div class="color-swatch__block" style="background:#1A1A2E;"></div>
+      <div class="color-swatch__info">
+        <p class="color-swatch__name">Text Primary</p>
+        <p class="color-swatch__hex">#1A1A2E</p>
+      </div>
+    </div>
+    <div class="color-swatch">
+      <div class="color-swatch__block" style="background:#6B7280;"></div>
+      <div class="color-swatch__info">
+        <p class="color-swatch__name">Text Secondary</p>
+        <p class="color-swatch__hex">#6B7280</p>
+      </div>
+    </div>
+    <div class="color-swatch">
+      <div class="color-swatch__block" style="background:#9CA3AF;"></div>
+      <div class="color-swatch__info">
+        <p class="color-swatch__name">Placeholder</p>
+        <p class="color-swatch__hex">#9CA3AF</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>

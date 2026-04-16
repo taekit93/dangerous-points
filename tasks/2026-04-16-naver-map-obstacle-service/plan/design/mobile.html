@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>장애물 지도 — 모바일 레이아웃</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="layout.css" />
+  <link rel="stylesheet" href="components.css" />
+  <style>
+    /* 모바일 미리보기: 360px 고정 */
+    body { background: #888; display: flex; align-items: flex-start; justify-content: center;
+           padding: 24px; overflow: auto; height: auto; }
+    .app-preview {
+      width: 360px;
+      height: 780px;
+      overflow: hidden;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+      position: relative;
+      flex-shrink: 0;
+    }
+    .app-preview .app { border-radius: 20px; }
+  </style>
+</head>
+<body>
+<div class="app-preview">
+<div class="app">
+
+  <!-- 헤더 -->
+  <header class="header" role="banner">
+    <div class="header__brand">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"
+              fill="rgba(255,255,255,0.9)"/>
+        <circle cx="12" cy="9" r="3" fill="#2D3E50"/>
+      </svg>
+      <span class="header__title">장애물 지도</span>
+      <span class="header__count-badge">5</span>
+    </div>
+  </header>
+
+  <!-- 모바일 필터 칩바 -->
+  <div class="mobile-filterbar" role="navigation" aria-label="카테고리 필터">
+    <button class="chip chip--active" aria-pressed="true">전체</button>
+    <button class="chip" aria-pressed="false">공사중</button>
+    <button class="chip" aria-pressed="false">도로파손</button>
+    <button class="chip" aria-pressed="false">침수</button>
+    <button class="chip" aria-pressed="false">낙석</button>
+    <button class="chip" aria-pressed="false">보행위험</button>
+    <button class="chip" aria-pressed="false">기타</button>
+  </div>
+
+  <!-- 지도 + 하단 시트 -->
+  <main class="main" role="main" style="flex-direction:column;">
+    <div class="map-container" style="height:100%;">
+
+      <!-- 지도 Placeholder -->
+      <!-- [네이버지도 영역] Naver Maps API 연동 필요 -->
+      <div class="map-area">
+        <div class="map-area__placeholder" role="img" aria-label="네이버지도 영역">
+          <!-- 격자 배경은 CSS로 처리됨 -->
+          <svg class="map-area__placeholder-icon" viewBox="0 0 32 40" fill="none">
+            <path d="M16 0C7.163 0 0 7.163 0 16C0 27 16 40 16 40C16 40 32 27 32 16C32 7.163 24.837 0 16 0Z"
+                  fill="#B8C8D4" opacity="0.7"/>
+            <circle cx="16" cy="16" r="6" fill="#8AACBC"/>
+          </svg>
+          <div class="map-area__placeholder-text">
+            <strong>네이버지도 영역</strong>
+            <span>지도를 탭하여 장애물 등록</span>
+          </div>
+        </div>
+
+        <!-- 마커 예시 -->
+        <div style="position:absolute; top:30%; left:45%; transform:translate(-50%,-100%);">
+          <svg width="28" height="35" viewBox="0 0 32 40">
+            <path d="M16 0C7.163 0 0 7.163 0 16C0 27 16 40 16 40C16 40 32 27 32 16C32 7.163 24.837 0 16 0Z"
+                  fill="#FF4444"/>
+            <circle cx="16" cy="16" r="5" fill="white"/>
+          </svg>
+        </div>
+        <div style="position:absolute; top:40%; left:58%; transform:translate(-50%,-100%);">
+          <svg width="28" height="35" viewBox="0 0 32 40">
+            <path d="M16 0C7.163 0 0 7.163 0 16C0 27 16 40 16 40C16 40 32 27 32 16C32 7.163 24.837 0 16 0Z"
+                  fill="#FFA500"/>
+            <circle cx="16" cy="16" r="5" fill="white"/>
+          </svg>
+        </div>
+        <div style="position:absolute; top:50%; left:35%; transform:translate(-50%,-100%);">
+          <svg width="28" height="35" viewBox="0 0 32 40">
+            <path d="M16 0C7.163 0 0 7.163 0 16C0 27 16 40 16 40C16 40 32 27 32 16C32 7.163 24.837 0 16 0Z"
+                  fill="#44BB44"/>
+            <circle cx="16" cy="16" r="5" fill="white"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- 지도 액션 (우하단) -->
+      <div class="map-actions" style="bottom:80px;">
+        <button class="map-action-btn" aria-label="줌 인">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2.5" stroke-linecap="round">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+        </button>
+        <button class="map-action-btn" aria-label="줌 아웃">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2.5" stroke-linecap="round">
+            <line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- 하단 시트 -->
+      <div class="bottom-sheet bottom-sheet--half" id="m-bottom-sheet"
+           role="region" aria-label="장애물 목록">
+
+        <div class="bottom-sheet__handle-area" id="m-handle">
+          <div class="bottom-sheet__handle" aria-hidden="true"></div>
+          <p class="bottom-sheet__summary">장애물 5개 · 탭하여 펼치기</p>
+        </div>
+
+        <div class="bottom-sheet__content">
+          <!-- 위험도 필터 -->
+          <div style="padding:8px 16px; border-bottom:1px solid var(--color-border);">
+            <div class="filterbar__danger-group">
+              <button class="danger-toggle danger-toggle--danger danger-toggle--active"
+                      style="font-size:11px;" aria-pressed="true">
+                <span class="danger-toggle__dot" style="background:var(--color-danger)"></span>위험
+              </button>
+              <button class="danger-toggle danger-toggle--warning danger-toggle--active"
+                      style="font-size:11px;" aria-pressed="true">
+                <span class="danger-toggle__dot" style="background:var(--color-warning)"></span>주의
+              </button>
+              <button class="danger-toggle danger-toggle--safe danger-toggle--active"
+                      style="font-size:11px;" aria-pressed="true">
+                <span class="danger-toggle__dot" style="background:var(--color-safe)"></span>안전
+              </button>
+            </div>
+          </div>
+          <!-- 검색 -->
+          <div class="search-wrap">
+            <span class="search-wrap__icon">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"/>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+            </span>
+            <input type="search" class="search-input" placeholder="검색" aria-label="검색"/>
+          </div>
+          <!-- 목록 -->
+          <ul class="marker-list" role="list">
+            <li class="marker-item" tabindex="0">
+              <div class="marker-item__dot-wrap">
+                <span class="danger-dot danger-dot--danger"></span>
+              </div>
+              <div class="marker-item__body">
+                <p class="marker-item__title">광화문 앞 도로 파손</p>
+                <div class="marker-item__meta">
+                  <span class="badge badge--category">도로파손</span>
+                  <span class="badge badge--danger">위험</span>
+                  <span class="marker-item__date">04-16</span>
+                </div>
+              </div>
+            </li>
+            <li class="marker-item" tabindex="0">
+              <div class="marker-item__dot-wrap">
+                <span class="danger-dot danger-dot--warning"></span>
+              </div>
+              <div class="marker-item__body">
+                <p class="marker-item__title">종로구 보도블록 침수 지점</p>
+                <div class="marker-item__meta">
+                  <span class="badge badge--category">침수</span>
+                  <span class="badge badge--warning">주의</span>
+                  <span class="marker-item__date">04-15</span>
+                </div>
+              </div>
+            </li>
+            <li class="marker-item" tabindex="0">
+              <div class="marker-item__dot-wrap">
+                <span class="danger-dot danger-dot--safe"></span>
+              </div>
+              <div class="marker-item__body">
+                <p class="marker-item__title">서울시청 인근 공사 구간</p>
+                <div class="marker-item__meta">
+                  <span class="badge badge--category">공사중</span>
+                  <span class="badge badge--safe">안전</span>
+                  <span class="marker-item__date">04-14</span>
+                </div>
+              </div>
+            </li>
+            <li class="marker-item" tabindex="0">
+              <div class="marker-item__dot-wrap">
+                <span class="danger-dot danger-dot--danger"></span>
+              </div>
+              <div class="marker-item__body">
+                <p class="marker-item__title">북악산 낙석 위험 구간</p>
+                <div class="marker-item__meta">
+                  <span class="badge badge--category">낙석</span>
+                  <span class="badge badge--danger">위험</span>
+                  <span class="marker-item__date">04-13</span>
+                </div>
+              </div>
+            </li>
+            <li class="marker-item" tabindex="0">
+              <div class="marker-item__dot-wrap">
+                <span class="danger-dot danger-dot--warning"></span>
+              </div>
+              <div class="marker-item__body">
+                <p class="marker-item__title">명동 보행자 통로 장애물</p>
+                <div class="marker-item__meta">
+                  <span class="badge badge--category">보행위험</span>
+                  <span class="badge badge--warning">주의</span>
+                  <span class="marker-item__date">04-12</span>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+</div>
+
+<script>
+const sheet = document.getElementById('m-bottom-sheet');
+const handle = document.getElementById('m-handle');
+const states = ['', 'bottom-sheet--half', 'bottom-sheet--full'];
+let idx = 1;
+
+if (handle) {
+  handle.addEventListener('click', () => {
+    sheet.classList.remove(...states.filter(Boolean));
+    idx = (idx + 1) % states.length;
+    if (states[idx]) sheet.classList.add(states[idx]);
+    const summary = handle.querySelector('.bottom-sheet__summary');
+    if (summary) {
+      summary.textContent = idx === 0 ? '장애물 5개 · 탭하여 펼치기' :
+                            idx === 1 ? '장애물 5개 · 탭하여 펼치기' :
+                            '장애물 5개';
+    }
+  });
+}
+
+document.querySelectorAll('.chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    chip.classList.toggle('chip--active');
+    chip.setAttribute('aria-pressed', chip.classList.contains('chip--active') ? 'true' : 'false');
+  });
+});
+document.querySelectorAll('.danger-toggle').forEach(btn => {
+  btn.addEventListener('click', () => {
+    btn.classList.toggle('danger-toggle--active');
+    btn.setAttribute('aria-pressed', btn.classList.contains('danger-toggle--active') ? 'true' : 'false');
+  });
+});
+</script>
+</body>
+</html>

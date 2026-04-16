@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>장애물 지도 — ObstacleForm 상태 모음</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="layout.css" />
+  <link rel="stylesheet" href="components.css" />
+  <style>
+    body {
+      background: var(--color-bg);
+      padding: 32px;
+      height: auto;
+      overflow: auto;
+    }
+    .preview-section {
+      margin-bottom: 48px;
+    }
+    .preview-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--color-text-secondary);
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .preview-row {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+      align-items: flex-start;
+    }
+    .preview-label {
+      font-size: 10px;
+      color: var(--color-text-placeholder);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* 모바일 시트 미리보기 컨테이너 */
+    .mobile-preview-wrap {
+      width: 360px;
+      height: 600px;
+      background: #C8D4DC;
+      border-radius: 16px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+    }
+  </style>
+</head>
+<body>
+
+<h1 style="font-size:20px; font-weight:700; color:var(--color-text-primary); margin-bottom:8px;">
+  ObstacleForm — 상태 모음
+</h1>
+<p style="font-size:13px; color:var(--color-text-secondary); margin-bottom:40px;">
+  등록 폼, 수정 폼, 에러 상태, 모바일 시트 형태의 정적 스냅샷
+</p>
+
+<!-- ═══════════════════════════════════════
+     1. 등록 폼 (데스크탑 모달)
+════════════════════════════════════════ -->
+<section class="preview-section">
+  <p class="preview-title">1. 장애물 등록 폼 — 데스크탑 (기본 상태)</p>
+  <div class="preview-row">
+    <div>
+      <p class="preview-label">빈 폼 (등록 모드)</p>
+      <div class="obstacle-form" style="box-shadow:var(--shadow-lg);">
+        <div class="obstacle-form__header">
+          <h2 class="obstacle-form__title">장애물 등록</h2>
+          <button class="obstacle-form__close" aria-label="닫기">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2.5" stroke-linecap="round">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+        <div class="obstacle-form__body">
+
+          <!-- 제목 -->
+          <div class="form-field">
+            <label class="form-label" for="title-empty">제목<span>*</span></label>
+            <input type="text" id="title-empty" class="form-input"
+                   placeholder="장애물 제목을 입력하세요" maxlength="100"/>
+          </div>
+
+          <!-- 카테고리 -->
+          <div class="form-field">
+            <label class="form-label" for="cat-empty">카테고리</label>
+            <select id="cat-empty" class="form-select">
+              <option value="">카테고리 선택</option>
+              <option>공사중</option>
+              <option>도로파손</option>
+              <option>침수</option>
+              <option>낙석</option>
+              <option>보행위험</option>
+              <option>기타</option>
+              <option value="custom">직접 입력</option>
+            </select>
+            <div class="form-custom-input" id="custom-input-empty">
+              <input type="text" class="form-input" placeholder="카테고리를 직접 입력하세요"/>
+            </div>
+          </div>
+
+          <!-- 위험도 -->
+          <div class="form-field">
+            <p class="form-label">위험도</p>
+            <div class="danger-radio-group" role="group" aria-label="위험도 선택">
+              <label class="danger-radio danger-radio--danger">
+                <input type="radio" name="danger-empty" value="위험" />
+                <span class="danger-radio__dot"></span>위험
+              </label>
+              <label class="danger-radio danger-radio--warning">
+                <input type="radio" name="danger-empty" value="주의" />
+                <span class="danger-radio__dot"></span>주의
+              </label>
+              <label class="danger-radio danger-radio--safe">
+                <input type="radio" name="danger-empty" value="안전" />
+                <span class="danger-radio__dot"></span>안전
+              </label>
+            </div>
+          </div>
+
+          <!-- 설명 -->
+          <div class="form-field">
+            <label class="form-label" for="desc-empty">설명</label>
+            <textarea id="desc-empty" class="form-textarea"
+                      placeholder="장애물에 대한 설명을 입력하세요 (선택)"></textarea>
+          </div>
+
+        </div>
+        <div class="obstacle-form__footer">
+          <button class="btn btn--cancel" type="button">취소</button>
+          <button class="btn btn--primary" type="submit">저장</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     2. 수정 폼 (pre-filled)
+════════════════════════════════════════ -->
+<section class="preview-section">
+  <p class="preview-title">2. 장애물 수정 폼 — 데이터 채워진 상태</p>
+  <div class="preview-row">
+    <div>
+      <p class="preview-label">수정 모드 (위험 선택됨)</p>
+      <div class="obstacle-form" style="box-shadow:var(--shadow-lg);">
+        <div class="obstacle-form__header">
+          <h2 class="obstacle-form__title">장애물 수정</h2>
+          <button class="obstacle-form__close" aria-label="닫기">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2.5" stroke-linecap="round">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+        <div class="obstacle-form__body">
+          <div class="form-field">
+            <label class="form-label" for="title-edit">제목<span>*</span></label>
+            <input type="text" id="title-edit" class="form-input"
+                   value="광화문 앞 도로 파손"/>
+          </div>
+          <div class="form-field">
+            <label class="form-label" for="cat-edit">카테고리</label>
+            <select id="cat-edit" class="form-select">
+              <option>공사중</option>
+              <option selected>도로파손</option>
+              <option>침수</option>
+              <option>낙석</option>
+              <option>보행위험</option>
+              <option>기타</option>
+              <option value="custom">직접 입력</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <p class="form-label">위험도</p>
+            <div class="danger-radio-group" role="group">
+              <label class="danger-radio danger-radio--danger danger-radio--selected">
+                <input type="radio" name="danger-edit" value="위험" checked/>
+                <span class="danger-radio__dot"></span>위험
+              </label>
+              <label class="danger-radio danger-radio--warning">
+                <input type="radio" name="danger-edit" value="주의"/>
+                <span class="danger-radio__dot"></span>주의
+              </label>
+              <label class="danger-radio danger-radio--safe">
+                <input type="radio" name="danger-edit" value="안전"/>
+                <span class="danger-radio__dot"></span>안전
+              </label>
+            </div>
+          </div>
+          <div class="form-field">
+            <label class="form-label" for="desc-edit">설명</label>
+            <textarea id="desc-edit" class="form-textarea"
+              >왕복 6차선 도로 우측 차선에 30cm 크기의 파손 발생. 야간 운행 시 주의 필요.</textarea>
+          </div>
+        </div>
+        <div class="obstacle-form__footer">
+          <button class="btn btn--cancel" type="button">취소</button>
+          <button class="btn btn--primary" type="submit">저장</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     3. 에러 상태
+════════════════════════════════════════ -->
+<section class="preview-section">
+  <p class="preview-title">3. 폼 검증 에러 상태</p>
+  <div class="preview-row">
+    <div>
+      <p class="preview-label">제목 미입력 에러</p>
+      <div class="obstacle-form" style="box-shadow:var(--shadow-lg);">
+        <div class="obstacle-form__header">
+          <h2 class="obstacle-form__title">장애물 등록</h2>
+          <button class="obstacle-form__close" aria-label="닫기">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2.5" stroke-linecap="round">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+        <div class="obstacle-form__body">
+          <div class="form-field">
+            <label class="form-label" for="title-err">제목<span>*</span></label>
+            <input type="text" id="title-err" class="form-input form-input--error"
+                   placeholder="장애물 제목을 입력하세요"
+                   aria-invalid="true" aria-describedby="title-err-msg"/>
+            <p class="form-error-msg" id="title-err-msg" role="alert">제목을 입력해주세요.</p>
+          </div>
+          <div class="form-field">
+            <label class="form-label" for="cat-err">카테고리</label>
+            <select id="cat-err" class="form-select">
+              <option value="" selected>카테고리 선택</option>
+              <option>공사중</option>
+              <option>도로파손</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <p class="form-label">위험도</p>
+            <div class="danger-radio-group" role="group">
+              <label class="danger-radio danger-radio--danger">
+                <input type="radio" name="danger-err" value="위험"/>
+                <span class="danger-radio__dot"></span>위험
+              </label>
+              <label class="danger-radio danger-radio--warning danger-radio--selected">
+                <input type="radio" name="danger-err" value="주의" checked/>
+                <span class="danger-radio__dot"></span>주의
+              </label>
+              <label class="danger-radio danger-radio--safe">
+                <input type="radio" name="danger-err" value="안전"/>
+                <span class="danger-radio__dot"></span>안전
+              </label>
+            </div>
+          </div>
+          <div class="form-field">
+            <label class="form-label" for="desc-err">설명</label>
+            <textarea id="desc-err" class="form-textarea"
+                      placeholder="장애물에 대한 설명을 입력하세요 (선택)"></textarea>
+          </div>
+        </div>
+        <div class="obstacle-form__footer">
+          <button class="btn btn--cancel">취소</button>
+          <button class="btn btn--primary">저장</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 직접 입력 카테고리 상태 -->
+    <div>
+      <p class="preview-label">카테고리 직접 입력 활성</p>
+      <div class="obstacle-form" style="box-shadow:var(--shadow-lg);">
+        <div class="obstacle-form__header">
+          <h2 class="obstacle-form__title">장애물 등록</h2>
+          <button class="obstacle-form__close" aria-label="닫기">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2.5" stroke-linecap="round">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+        <div class="obstacle-form__body">
+          <div class="form-field">
+            <label class="form-label" for="title-custom">제목<span>*</span></label>
+            <input type="text" id="title-custom" class="form-input"
+                   value="한강변 자전거 도로 이물질"/>
+          </div>
+          <div class="form-field">
+            <label class="form-label" for="cat-custom">카테고리</label>
+            <select id="cat-custom" class="form-select">
+              <option>공사중</option>
+              <option>도로파손</option>
+              <option>침수</option>
+              <option>낙석</option>
+              <option>보행위험</option>
+              <option>기타</option>
+              <option selected value="custom">직접 입력</option>
+            </select>
+            <!-- 직접 입력 필드 (visible 상태) -->
+            <div class="form-custom-input form-custom-input--visible">
+              <input type="text" class="form-input" value="자전거도로"
+                     placeholder="카테고리를 직접 입력하세요"/>
+            </div>
+          </div>
+          <div class="form-field">
+            <p class="form-label">위험도</p>
+            <div class="danger-radio-group" role="group">
+              <label class="danger-radio danger-radio--danger">
+                <input type="radio" name="danger-custom" value="위험"/>
+                <span class="danger-radio__dot"></span>위험
+              </label>
+              <label class="danger-radio danger-radio--warning">
+                <input type="radio" name="danger-custom" value="주의"/>
+                <span class="danger-radio__dot"></span>주의
+              </label>
+              <label class="danger-radio danger-radio--safe danger-radio--selected">
+                <input type="radio" name="danger-custom" value="안전" checked/>
+                <span class="danger-radio__dot"></span>안전
+              </label>
+            </div>
+          </div>
+          <div class="form-field">
+            <label class="form-label" for="desc-custom">설명</label>
+            <textarea id="desc-custom" class="form-textarea">한강 자전거 도로 3km 지점에 낙엽 더미 및 돌멩이 산재</textarea>
+          </div>
+        </div>
+        <div class="obstacle-form__footer">
+          <button class="btn btn--cancel">취소</button>
+          <button class="btn btn--primary">저장</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     4. 모바일 하단 시트 형태
+════════════════════════════════════════ -->
+<section class="preview-section">
+  <p class="preview-title">4. 모바일 하단 시트 폼</p>
+  <div class="preview-row">
+    <div>
+      <p class="preview-label">모바일 Sheet (360px 너비)</p>
+      <div class="mobile-preview-wrap">
+        <!-- 지도 배경 -->
+        <div style="width:100%; height:100%; background:linear-gradient(rgba(200,212,220,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(200,212,220,0.6) 1px, transparent 1px), #C8D4DC; background-size:30px 30px, 30px 30px, 100%;">
+        </div>
+        <!-- 폼 오버레이 -->
+        <div style="position:absolute; inset:0; background:rgba(0,0,0,0.4); display:flex; align-items:flex-end;">
+          <div class="obstacle-form obstacle-form--sheet" style="box-shadow:0 -4px 20px rgba(0,0,0,0.15);">
+            <!-- 핸들 바 -->
+            <div style="display:flex; justify-content:center; padding:10px 0 4px;">
+              <div style="width:32px; height:4px; background:var(--color-border); border-radius:99px;"></div>
+            </div>
+            <div class="obstacle-form__header" style="padding-top:8px;">
+              <h2 class="obstacle-form__title">장애물 등록</h2>
+              <button class="obstacle-form__close" aria-label="닫기">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2.5" stroke-linecap="round">
+                  <line x1="18" y1="6" x2="6" y2="18"/>
+                  <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+              </button>
+            </div>
+            <div class="obstacle-form__body">
+              <div class="form-field">
+                <label class="form-label" for="title-mobile">제목<span>*</span></label>
+                <input type="text" id="title-mobile" class="form-input"
+                       placeholder="장애물 제목을 입력하세요" style="font-size:16px;"/>
+                <!-- font-size:16px → iOS 자동 줌 방지 -->
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="cat-mobile">카테고리</label>
+                <select id="cat-mobile" class="form-select" style="font-size:16px;">
+                  <option value="">카테고리 선택</option>
+                  <option>공사중</option>
+                  <option>도로파손</option>
+                  <option>침수</option>
+                  <option>낙석</option>
+                  <option>보행위험</option>
+                  <option>기타</option>
+                  <option value="custom">직접 입력</option>
+                </select>
+              </div>
+              <div class="form-field">
+                <p class="form-label">위험도</p>
+                <div class="danger-radio-group" role="group">
+                  <label class="danger-radio danger-radio--danger">
+                    <input type="radio" name="danger-mobile" value="위험"/>
+                    <span class="danger-radio__dot"></span>위험
+                  </label>
+                  <label class="danger-radio danger-radio--warning">
+                    <input type="radio" name="danger-mobile" value="주의"/>
+                    <span class="danger-radio__dot"></span>주의
+                  </label>
+                  <label class="danger-radio danger-radio--safe">
+                    <input type="radio" name="danger-mobile" value="안전"/>
+                    <span class="danger-radio__dot"></span>안전
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div class="obstacle-form__footer">
+              <button class="btn btn--cancel">취소</button>
+              <button class="btn btn--primary">저장</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+/* 카테고리 select 직접 입력 토글 */
+document.querySelectorAll('select[id^="cat-"]').forEach(sel => {
+  sel.addEventListener('change', () => {
+    const field = sel.parentElement;
+    const customInput = field.querySelector('.form-custom-input');
+    if (customInput) {
+      const isCustom = sel.value === 'custom';
+      customInput.classList.toggle('form-custom-input--visible', isCustom);
+    }
+  });
+});
+
+/* 라디오 선택 시 시각 상태 */
+document.querySelectorAll('.danger-radio').forEach(label => {
+  label.addEventListener('click', () => {
+    const group = label.closest('.danger-radio-group');
+    group.querySelectorAll('.danger-radio').forEach(l => l.classList.remove('danger-radio--selected'));
+    label.classList.add('danger-radio--selected');
+  });
+});
+</script>
+</body>
+</html>

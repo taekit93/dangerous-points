@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>장애물 지도 — 데스크탑 레이아웃</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="layout.css" />
+  <link rel="stylesheet" href="components.css" />
+</head>
+<body>
+<div class="app">
+
+  <!-- ═══════════════════════════════════
+       헤더
+  ════════════════════════════════════ -->
+  <header class="header" role="banner">
+    <div class="header__brand">
+      <!-- 핀 아이콘 (인라인 SVG) -->
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"
+              fill="rgba(255,255,255,0.9)"/>
+        <circle cx="12" cy="9" r="3" fill="#2D3E50"/>
+      </svg>
+      <span class="header__title">장애물 지도</span>
+      <span class="header__count-badge" aria-label="등록된 마커 5개">5</span>
+    </div>
+    <div class="header__actions">
+      <!-- 태블릿 사이드바 토글 -->
+      <button class="header__toggle-btn" aria-label="사이드바 열기/닫기"
+              aria-expanded="false" aria-controls="sidebar">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ═══════════════════════════════════
+       모바일 필터바 (헤더 바로 아래)
+  ════════════════════════════════════ -->
+  <div class="mobile-filterbar" role="navigation" aria-label="카테고리 필터">
+    <button class="chip chip--active" aria-pressed="true">전체</button>
+    <button class="chip" aria-pressed="false">공사중</button>
+    <button class="chip" aria-pressed="false">도로파손</button>
+    <button class="chip" aria-pressed="false">침수</button>
+    <button class="chip" aria-pressed="false">낙석</button>
+    <button class="chip" aria-pressed="false">보행위험</button>
+    <button class="chip" aria-pressed="false">기타</button>
+  </div>
+
+  <!-- ═══════════════════════════════════
+       본문 (사이드바 + 지도)
+  ════════════════════════════════════ -->
+  <main class="main" role="main">
+
+    <!-- 태블릿 사이드바 백드롭 -->
+    <div class="sidebar-backdrop" aria-hidden="true"></div>
+
+    <!-- ─ 사이드바 ──────────────────── -->
+    <aside class="sidebar" id="sidebar" role="complementary" aria-label="장애물 목록">
+
+      <!-- 필터바 -->
+      <section class="filterbar" aria-label="필터">
+        <div>
+          <p class="filterbar__label">카테고리</p>
+          <div class="filterbar__chips" role="group" aria-label="카테고리 필터">
+            <button class="chip chip--active" aria-pressed="true">전체</button>
+            <button class="chip" aria-pressed="false">공사중</button>
+            <button class="chip" aria-pressed="false">도로파손</button>
+            <button class="chip" aria-pressed="false">침수</button>
+            <button class="chip" aria-pressed="false">낙석</button>
+            <button class="chip" aria-pressed="false">보행위험</button>
+            <button class="chip" aria-pressed="false">기타</button>
+          </div>
+        </div>
+        <div>
+          <p class="filterbar__label">위험도</p>
+          <div class="filterbar__danger-group" role="group" aria-label="위험도 필터">
+            <button class="danger-toggle danger-toggle--danger danger-toggle--active"
+                    aria-pressed="true">
+              <span class="danger-toggle__dot" style="background:var(--color-danger)"></span>
+              위험
+            </button>
+            <button class="danger-toggle danger-toggle--warning danger-toggle--active"
+                    aria-pressed="true">
+              <span class="danger-toggle__dot" style="background:var(--color-warning)"></span>
+              주의
+            </button>
+            <button class="danger-toggle danger-toggle--safe danger-toggle--active"
+                    aria-pressed="true">
+              <span class="danger-toggle__dot" style="background:var(--color-safe)"></span>
+              안전
+            </button>
+          </div>
+        </div>
+        <button class="filterbar__reset">필터 초기화</button>
+      </section>
+
+      <!-- 검색 -->
+      <div class="search-wrap">
+        <span class="search-wrap__icon" aria-hidden="true">
+          <!-- 돋보기 아이콘 -->
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+        </span>
+        <input type="search" class="search-input" id="search-input"
+               placeholder="제목 또는 설명 검색"
+               aria-label="장애물 검색" />
+      </div>
+
+      <!-- 마커 목록 -->
+      <ul class="marker-list" role="list" aria-label="장애물 목록">
+
+        <!-- 아이템 1: 위험 -->
+        <li class="marker-item marker-item--active" role="listitem"
+            tabindex="0" aria-selected="true">
+          <div class="marker-item__dot-wrap">
+            <span class="danger-dot danger-dot--danger" aria-label="위험"></span>
+          </div>
+          <div class="marker-item__body">
+            <p class="marker-item__title">광화문 앞 도로 파손</p>
+            <div class="marker-item__meta">
+              <span class="badge badge--category">도로파손</span>
+              <span class="badge badge--danger">위험</span>
+              <span class="marker-item__date">2026-04-16</span>
+            </div>
+          </div>
+          <button class="marker-item__delete" aria-label="장애물 삭제">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2.5" stroke-linecap="round">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </li>
+
+        <!-- 아이템 2: 주의 -->
+        <li class="marker-item" role="listitem" tabindex="0">
+          <div class="marker-item__dot-wrap">
+            <span class="danger-dot danger-dot--warning" aria-label="주의"></span>
+          </div>
+          <div class="marker-item__body">
+            <p class="marker-item__title">종로구 보도블록 침수 지점</p>
+            <div class="marker-item__meta">
+              <span class="badge badge--category">침수</span>
+              <span class="badge badge--warning">주의</span>
+              <span class="marker-item__date">2026-04-15</span>
+            </div>
+          </div>
+          <button class="marker-item__delete" aria-label="장애물 삭제">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2.5" stroke-linecap="round">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </li>
+
+        <!-- 아이템 3: 안전 -->
+        <li class="marker-item" role="listitem" tabindex="0">
+          <div class="marker-item__dot-wrap">
+            <span class="danger-dot danger-dot--safe" aria-label="안전"></span>
+          </div>
+          <div class="marker-item__body">
+            <p class="marker-item__title">서울시청 인근 공사 구간</p>
+            <div class="marker-item__meta">
+              <span class="badge badge--category">공사중</span>
+              <span class="badge badge--safe">안전</span>
+              <span class="marker-item__date">2026-04-14</span>
+            </div>
+          </div>
+          <button class="marker-item__delete" aria-label="장애물 삭제">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2.5" stroke-linecap="round">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </li>
+
+        <!-- 아이템 4: 위험 -->
+        <li class="marker-item" role="listitem" tabindex="0">
+          <div class="marker-item__dot-wrap">
+            <span class="danger-dot danger-dot--danger" aria-label="위험"></span>
+          </div>
+          <div class="marker-item__body">
+            <p class="marker-item__title">북악산 등산로 낙석 위험 구간</p>
+            <div class="marker-item__meta">
+              <span class="badge badge--category">낙석</span>
+              <span class="badge badge--danger">위험</span>
+              <span class="marker-item__date">2026-04-13</span>
+            </div>
+          </div>
+          <button class="marker-item__delete" aria-label="장애물 삭제">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2.5" stroke-linecap="round">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </li>
+
+        <!-- 아이템 5: 주의 -->
+        <li class="marker-item" role="listitem" tabindex="0">
+          <div class="marker-item__dot-wrap">
+            <span class="danger-dot danger-dot--warning" aria-label="주의"></span>
+          </div>
+          <div class="marker-item__body">
+            <p class="marker-item__title">명동 보행자 통로 장애물</p>
+            <div class="marker-item__meta">
+              <span class="badge badge--category">보행위험</span>
+              <span class="badge badge--warning">주의</span>
+              <span class="marker-item__date">2026-04-12</span>
+            </div>
+          </div>
+          <button class="marker-item__delete" aria-label="장애물 삭제">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2.5" stroke-linecap="round">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </li>
+
+      </ul>
+    </aside>
+
+    <!-- ─ 지도 영역 ─────────────────── -->
+    <div class="map-container">
+
+      <!-- [네이버지도 영역] Naver Maps Dynamic Map API 연동 필요 -->
+      <!-- API 키 발급: https://console.ncloud.com (Maps 서비스 신청) -->
+      <!-- ncpClientId를 .env 파일의 VITE_NAVER_CLIENT_ID에 설정 -->
+      <div class="map-area">
+        <div class="map-area__placeholder" role="img" aria-label="네이버지도 표시 영역">
+          <!-- 지도 핀 SVG -->
+          <svg class="map-area__placeholder-icon" viewBox="0 0 32 40" fill="none"
+               aria-hidden="true">
+            <path d="M16 0C7.163 0 0 7.163 0 16C0 27 16 40 16 40C16 40 32 27 32 16C32 7.163 24.837 0 16 0Z"
+                  fill="#B8C8D4" opacity="0.7"/>
+            <circle cx="16" cy="16" r="6" fill="#8AACBC"/>
+          </svg>
+          <div class="map-area__placeholder-text">
+            <strong>네이버지도 영역</strong>
+            <span>Naver Maps Dynamic Map API 연동 필요</span>
+          </div>
+        </div>
+
+        <!-- 가상 마커들 (위치 예시) -->
+        <div style="position:absolute; top:35%; left:48%; transform:translate(-50%,-100%);">
+          <svg width="32" height="40" viewBox="0 0 32 40" class="temp-pin">
+            <path d="M16 0C7.163 0 0 7.163 0 16C0 27 16 40 16 40C16 40 32 27 32 16C32 7.163 24.837 0 16 0Z"
+                  fill="#FF4444"/>
+            <circle cx="16" cy="16" r="5" fill="white"/>
+          </svg>
+        </div>
+        <div style="position:absolute; top:42%; left:52%; transform:translate(-50%,-100%);">
+          <svg width="28" height="35" viewBox="0 0 32 40">
+            <path d="M16 0C7.163 0 0 7.163 0 16C0 27 16 40 16 40C16 40 32 27 32 16C32 7.163 24.837 0 16 0Z"
+                  fill="#FFA500"/>
+            <circle cx="16" cy="16" r="5" fill="white"/>
+          </svg>
+        </div>
+        <div style="position:absolute; top:38%; left:55%; transform:translate(-50%,-100%);">
+          <svg width="28" height="35" viewBox="0 0 32 40">
+            <path d="M16 0C7.163 0 0 7.163 0 16C0 27 16 40 16 40C16 40 32 27 32 16C32 7.163 24.837 0 16 0Z"
+                  fill="#44BB44"/>
+            <circle cx="16" cy="16" r="5" fill="white"/>
+          </svg>
+        </div>
+        <div style="position:absolute; top:55%; left:44%; transform:translate(-50%,-100%);">
+          <svg width="28" height="35" viewBox="0 0 32 40">
+            <path d="M16 0C7.163 0 0 7.163 0 16C0 27 16 40 16 40C16 40 32 27 32 16C32 7.163 24.837 0 16 0Z"
+                  fill="#FF4444"/>
+            <circle cx="16" cy="16" r="5" fill="white"/>
+          </svg>
+        </div>
+
+        <!-- InfoWindow 예시 (마커 클릭 시 표시) -->
+        <div style="position:absolute; top:20%; left:45%; transform:translateX(-50%);
+                    background:white; border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,0.15);
+                    z-index:10;">
+          <div class="iw-wrap">
+            <button class="iw-close" aria-label="닫기">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="2.5" stroke-linecap="round">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+            <div class="iw-badges">
+              <span class="badge badge--category">도로파손</span>
+              <span class="badge badge--danger">위험</span>
+            </div>
+            <p class="iw-title">광화문 앞 도로 파손</p>
+            <p class="iw-desc">왕복 6차선 도로 우측 차선에 30cm 크기의 파손 발생. 야간 운행 시 주의 필요.</p>
+            <p class="iw-date">2026-04-16 등록</p>
+            <div class="iw-actions">
+              <button class="iw-btn iw-btn--edit">수정</button>
+              <button class="iw-btn iw-btn--delete">삭제</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 지도 액션 버튼 -->
+      <div class="map-actions" aria-label="지도 조작">
+        <button class="map-action-btn" aria-label="줌 인" title="줌 인">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2.5" stroke-linecap="round">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+        </button>
+        <button class="map-action-btn" aria-label="줌 아웃" title="줌 아웃">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2.5" stroke-linecap="round">
+            <line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+        </button>
+        <button class="map-action-btn" aria-label="현재 위치" title="현재 위치"
+                style="margin-top:4px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M12 1v4M12 19v4M1 12h4M19 12h4"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- 하단 시트 (모바일) -->
+      <div class="bottom-sheet bottom-sheet--half" role="region"
+           aria-label="장애물 목록" id="bottom-sheet">
+        <div class="bottom-sheet__handle-area" aria-label="패널 크기 조절">
+          <div class="bottom-sheet__handle" aria-hidden="true"></div>
+          <p class="bottom-sheet__summary">장애물 5개</p>
+        </div>
+        <div class="bottom-sheet__content">
+          <!-- 필터바 (모바일 시트 내부) -->
+          <section class="filterbar" style="padding:12px 16px;">
+            <div class="filterbar__danger-group" role="group">
+              <button class="danger-toggle danger-toggle--danger danger-toggle--active"
+                      aria-pressed="true">
+                <span class="danger-toggle__dot"></span>위험
+              </button>
+              <button class="danger-toggle danger-toggle--warning danger-toggle--active"
+                      aria-pressed="true">
+                <span class="danger-toggle__dot"></span>주의
+              </button>
+              <button class="danger-toggle danger-toggle--safe danger-toggle--active"
+                      aria-pressed="true">
+                <span class="danger-toggle__dot"></span>안전
+              </button>
+            </div>
+          </section>
+          <!-- 검색 -->
+          <div class="search-wrap">
+            <span class="search-wrap__icon" aria-hidden="true">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"/>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+            </span>
+            <input type="search" class="search-input" placeholder="검색" aria-label="장애물 검색"/>
+          </div>
+          <!-- 목록 -->
+          <ul class="marker-list" role="list">
+            <li class="marker-item" tabindex="0">
+              <div class="marker-item__dot-wrap">
+                <span class="danger-dot danger-dot--danger" aria-label="위험"></span>
+              </div>
+              <div class="marker-item__body">
+                <p class="marker-item__title">광화문 앞 도로 파손</p>
+                <div class="marker-item__meta">
+                  <span class="badge badge--category">도로파손</span>
+                  <span class="badge badge--danger">위험</span>
+                </div>
+              </div>
+            </li>
+            <li class="marker-item" tabindex="0">
+              <div class="marker-item__dot-wrap">
+                <span class="danger-dot danger-dot--warning" aria-label="주의"></span>
+              </div>
+              <div class="marker-item__body">
+                <p class="marker-item__title">종로구 보도블록 침수 지점</p>
+                <div class="marker-item__meta">
+                  <span class="badge badge--category">침수</span>
+                  <span class="badge badge--warning">주의</span>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+    </div><!-- /map-container -->
+  </main>
+</div><!-- /app -->
+
+<script>
+/* 사이드바 토글 (데모용) */
+const toggleBtn = document.querySelector('.header__toggle-btn');
+const sidebar   = document.getElementById('sidebar');
+const backdrop  = document.querySelector('.sidebar-backdrop');
+
+if (toggleBtn && sidebar) {
+  toggleBtn.addEventListener('click', () => {
+    const isOpen = sidebar.classList.toggle('sidebar--open');
+    backdrop.classList.toggle('sidebar-backdrop--visible', isOpen);
+    toggleBtn.setAttribute('aria-expanded', String(isOpen));
+  });
+}
+if (backdrop) {
+  backdrop.addEventListener('click', () => {
+    sidebar.classList.remove('sidebar--open');
+    backdrop.classList.remove('sidebar-backdrop--visible');
+    toggleBtn && toggleBtn.setAttribute('aria-expanded', 'false');
+  });
+}
+
+/* 하단 시트 드래그 (데모용 — 클릭으로 상태 순환) */
+const sheet = document.getElementById('bottom-sheet');
+const handleArea = sheet && sheet.querySelector('.bottom-sheet__handle-area');
+const states = ['', 'bottom-sheet--half', 'bottom-sheet--full'];
+let stateIdx = 1;
+
+if (handleArea) {
+  handleArea.addEventListener('click', () => {
+    sheet.classList.remove(...states.filter(Boolean));
+    stateIdx = (stateIdx + 1) % states.length;
+    if (states[stateIdx]) sheet.classList.add(states[stateIdx]);
+  });
+}
+
+/* 마커 아이템 클릭 활성화 */
+document.querySelectorAll('.marker-item').forEach(item => {
+  item.addEventListener('click', () => {
+    document.querySelectorAll('.marker-item').forEach(i => i.classList.remove('marker-item--active'));
+    item.classList.add('marker-item--active');
+  });
+  item.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') item.click();
+  });
+});
+
+/* 칩 토글 */
+document.querySelectorAll('.chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    chip.classList.toggle('chip--active');
+    chip.setAttribute('aria-pressed', chip.classList.contains('chip--active') ? 'true' : 'false');
+  });
+});
+
+/* 위험도 토글 */
+document.querySelectorAll('.danger-toggle').forEach(btn => {
+  btn.addEventListener('click', () => {
+    btn.classList.toggle('danger-toggle--active');
+    btn.setAttribute('aria-pressed', btn.classList.contains('danger-toggle--active') ? 'true' : 'false');
+  });
+});
+</script>
+</body>
+</html>

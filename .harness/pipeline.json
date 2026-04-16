@@ -1,0 +1,11 @@
+{
+  "active": true,
+  "stage": "verify",
+  "taskPath": "tasks/2026-04-16-line-polygon-click-fix",
+  "projectPath": "j:/KHT/Study/Harness-Test/dangerous-points",
+  "worktreePath": ".worktrees/line-polygon-click-fix",
+  "worktreeBranch": "task/2026-04-16-line-polygon-click-fix",
+  "includeDesign": false,
+  "verified": true,
+  "mergeable": true
+}

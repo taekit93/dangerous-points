@@ -1,9 +1,35 @@
-# KHT Harness — 런타임 상태 (gitignore)
-.harness/
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
-# 비주얼 컴패니언
-.superpowers/
+node_modules
+dist
+dist-ssr
+*.local
+# dotenv environment variable files
+.env.development.local
+.env.test.local
+.env.production.local
+.env.local
 
-# OS
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
 .DS_Store
-Thumbs.db
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Playwright
+playwright/.auth/
+test-results/
+playwright-report/
+.worktrees
