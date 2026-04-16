@@ -195,6 +195,7 @@ export default function Map({
           strokeColor: color,
           strokeWeight: 4,
           strokeOpacity: 0.9,
+          clickable: true,
         })
         const listener = window.naver.maps.Event.addListener(polyline, 'click', () =>
           onMarkerClickRef.current(obstacle.id)
@@ -212,6 +213,7 @@ export default function Map({
           strokeColor: color,
           strokeWeight: 2,
           strokeOpacity: 0.9,
+          clickable: true,
         })
         const listener = window.naver.maps.Event.addListener(polygon, 'click', () =>
           onMarkerClickRef.current(obstacle.id)
