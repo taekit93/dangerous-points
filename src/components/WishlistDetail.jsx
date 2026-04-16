@@ -105,7 +105,7 @@ export default function WishlistDetail({ item, onVisit, onAddReview, onDelete, o
                   aria-label="방문 번호 선택"
                 >
                   <option value="">방문 번호 선택 (선택)</option>
-                  {Array.from({ length: 9 }, (_, i) => i + 1).map((n) => (
+                  {Array.from({ length: item.visitCount }, (_, i) => i + 1).map((n) => (
                     <option key={n} value={n}>
                       {n}번째 방문
                     </option>

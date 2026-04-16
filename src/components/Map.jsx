@@ -23,6 +23,7 @@ export default function Map({
   onDrawCancel,
   wishlistItems = [],
   onWishlistItemClick,
+  activeMode,
 }) {
   const mapContainerRef = useRef(null)
   const [mapReady, setMapReady] = useState(false)
@@ -360,14 +361,18 @@ export default function Map({
           )}
         </div>
       )}
-      <DrawToolbar drawMode={drawMode} onModeChange={onDrawModeChange} />
-      <DrawStatusBar
-        drawMode={drawMode}
-        coordCount={coords?.length ?? 0}
-        onComplete={onDrawComplete}
-        onUndo={onDrawUndo}
-        onCancel={onDrawCancel}
-      />
+      {activeMode === 'obstacle' && (
+        <DrawToolbar drawMode={drawMode} onModeChange={onDrawModeChange} />
+      )}
+      {activeMode === 'obstacle' && (
+        <DrawStatusBar
+          drawMode={drawMode}
+          coordCount={coords?.length ?? 0}
+          onComplete={onDrawComplete}
+          onUndo={onDrawUndo}
+          onCancel={onDrawCancel}
+        />
+      )}
     </div>
   )
 }
