@@ -1,0 +1,124 @@
+.iw-container {
+  width: 220px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  padding: 14px;
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 13px;
+  position: relative;
+}
+
+.iw-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 22px;
+  height: 22px;
+  border: none;
+  background: #f5f5f5;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  line-height: 1;
+  padding: 0;
+}
+
+.iw-close:hover {
+  background: #e0e0e0;
+}
+
+.iw-badges {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.iw-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.iw-badge.iw-cat {
+  background: #EEF0F3;
+  color: #2D3E50;
+}
+
+.iw-badge.iw-danger--위험 {
+  background: #FF4444;
+  color: #fff;
+}
+
+.iw-badge.iw-danger--주의 {
+  background: #FFA500;
+  color: #fff;
+}
+
+.iw-badge.iw-danger--안전 {
+  background: #44BB44;
+  color: #fff;
+}
+
+.iw-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1A1A2E;
+  margin-bottom: 4px;
+  padding-right: 24px;
+  word-break: break-all;
+}
+
+.iw-desc {
+  font-size: 12px;
+  color: #6B7280;
+  margin-bottom: 6px;
+  line-height: 1.4;
+  word-break: break-all;
+}
+
+.iw-date {
+  font-size: 11px;
+  color: #9CA3AF;
+  margin-bottom: 10px;
+}
+
+.iw-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.iw-btn {
+  flex: 1;
+  padding: 6px 0;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  font-family: inherit;
+}
+
+.iw-btn:hover {
+  opacity: 0.85;
+}
+
+.iw-btn--edit {
+  background: #2D3E50;
+  color: #fff;
+}
+
+.iw-btn--delete {
+  background: #FF4444;
+  color: #fff;
+}
