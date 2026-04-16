@@ -44,6 +44,8 @@ export default function ObstacleForm({ formState, onSave, onClose }) {
       ...(isEdit ? existing : {}),
       lat: formState.lat,
       lng: formState.lng,
+      type: formState.type ?? 'point',
+      coordinates: formState.coordinates ?? null,
       title: title.trim(),
       category: isCustomCategory ? customCategory.trim() || '기타' : category,
       dangerLevel,
@@ -61,12 +63,23 @@ export default function ObstacleForm({ formState, onSave, onClose }) {
           </button>
         </div>
 
-        <div className={styles.coords}>
-          <span className={styles.coordsLabel}>위치</span>
-          <span className={styles.coordsValue}>
-            {formState.lat.toFixed(5)}, {formState.lng.toFixed(5)}
-          </span>
-        </div>
+        {formState.type && formState.type !== 'point' ? (
+          <div className={styles.coords}>
+            <span className={styles.coordsLabel}>
+              {formState.type === 'line' ? '선' : '면'}
+            </span>
+            <span className={styles.coordsValue}>
+              좌표 {formState.coordinates?.length}개
+            </span>
+          </div>
+        ) : (
+          <div className={styles.coords}>
+            <span className={styles.coordsLabel}>위치</span>
+            <span className={styles.coordsValue}>
+              {formState.lat.toFixed(5)}, {formState.lng.toFixed(5)}
+            </span>
+          </div>
+        )}
 
         <form className={styles.form} onSubmit={handleSubmit}>
           <div className={styles.field}>

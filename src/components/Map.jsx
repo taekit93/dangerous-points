@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { DANGER_COLORS } from '../constants/categories'
+import DrawToolbar from './DrawToolbar'
+import DrawStatusBar from './DrawStatusBar'
 import styles from './Map.module.css'
 
 export default function Map({
@@ -13,10 +15,18 @@ export default function Map({
   onCloseInfoWindow,
   onEditObstacle,
   onDeleteObstacle,
+  coords,
+  drawMode,
+  onDrawModeChange,
+  onDrawComplete,
+  onDrawUndo,
+  onDrawCancel,
 }) {
   const mapContainerRef = useRef(null)
   const [mapReady, setMapReady] = useState(false)
   const infoWindowRef = useRef(null)
+  const previewPolylineRef = useRef(null)
+  const previewPolygonRef = useRef(null)
 
   // C-1: 외부 콜백을 ref로 감싸 최신 참조 유지
   const onMapClickRef = useRef(onMapClick)
@@ -95,17 +105,120 @@ export default function Map({
     }
   }, [])
 
-  // C-1 + M-1: 마커 동기화 — deps 정확히 명시, 리스너 누수 수정
+  // 드로잉 프리뷰 오버레이
   useEffect(() => {
     if (!mapReady || !mapRef.current) return
 
+    // 기존 프리뷰 제거
+    if (previewPolylineRef.current) {
+      previewPolylineRef.current.setMap(null)
+      previewPolylineRef.current = null
+    }
+    if (previewPolygonRef.current) {
+      previewPolygonRef.current.setMap(null)
+      previewPolygonRef.current = null
+    }
+
+    if (!coords || coords.length === 0) return
+
+    const path = coords.map((c) => new window.naver.maps.LatLng(c.lat, c.lng))
+
+    if (drawMode === 'line' && coords.length > 0) {
+      previewPolylineRef.current = new window.naver.maps.Polyline({
+        map: mapRef.current,
+        path,
+        strokeColor: '#4A90D9',
+        strokeWeight: 3,
+        strokeOpacity: 0.8,
+        strokeStyle: 'dashed',
+      })
+    } else if (drawMode === 'polygon' && coords.length > 0) {
+      previewPolygonRef.current = new window.naver.maps.Polygon({
+        map: mapRef.current,
+        paths: [path],
+        fillColor: '#4A90D9',
+        fillOpacity: 0.2,
+        strokeColor: '#4A90D9',
+        strokeWeight: 3,
+        strokeOpacity: 0.8,
+        strokeStyle: 'dashed',
+      })
+    }
+
+    return () => {
+      if (previewPolylineRef.current) {
+        previewPolylineRef.current.setMap(null)
+        previewPolylineRef.current = null
+      }
+      if (previewPolygonRef.current) {
+        previewPolygonRef.current.setMap(null)
+        previewPolygonRef.current = null
+      }
+    }
+  }, [coords, drawMode, mapReady])
+
+  // C-1 + M-1: 마커/오버레이 동기화
+  useEffect(() => {
+    if (!mapReady || !mapRef.current) return
+
+    // 기존 항목 중 현재 obstacles에 없는 것 숨기기
     Object.entries(markersRef.current).forEach(([id, entry]) => {
       const isVisible = obstacles.some((o) => o.id === id)
-      entry.marker.setVisible(isVisible)
+      if (entry.marker) {
+        entry.marker.setVisible(isVisible)
+      } else if (entry.polyline) {
+        entry.polyline.setVisible(isVisible)
+      } else if (entry.polygon) {
+        entry.polygon.setVisible(isVisible)
+      }
     })
 
     obstacles.forEach((obstacle) => {
-      if (!markersRef.current[obstacle.id]) {
+      if (markersRef.current[obstacle.id]) {
+        // 아이콘 업데이트 (point만)
+        const entry = markersRef.current[obstacle.id]
+        if (entry.marker) {
+          entry.marker.setIcon(createMarkerIcon(obstacle.dangerLevel))
+        }
+        return
+      }
+
+      const color = DANGER_COLORS[obstacle.dangerLevel] || '#999'
+
+      if (obstacle.type === 'line' && obstacle.coordinates?.length > 0) {
+        const path = obstacle.coordinates.map(
+          (c) => new window.naver.maps.LatLng(c.lat, c.lng)
+        )
+        const polyline = new window.naver.maps.Polyline({
+          map: mapRef.current,
+          path,
+          strokeColor: color,
+          strokeWeight: 4,
+          strokeOpacity: 0.9,
+        })
+        const listener = window.naver.maps.Event.addListener(polyline, 'click', () =>
+          onMarkerClickRef.current(obstacle.id)
+        )
+        markersRef.current[obstacle.id] = { polyline, listener }
+      } else if (obstacle.type === 'polygon' && obstacle.coordinates?.length > 0) {
+        const path = obstacle.coordinates.map(
+          (c) => new window.naver.maps.LatLng(c.lat, c.lng)
+        )
+        const polygon = new window.naver.maps.Polygon({
+          map: mapRef.current,
+          paths: [path],
+          fillColor: color,
+          fillOpacity: 0.3,
+          strokeColor: color,
+          strokeWeight: 2,
+          strokeOpacity: 0.9,
+        })
+        const listener = window.naver.maps.Event.addListener(polygon, 'click', () =>
+          onMarkerClickRef.current(obstacle.id)
+        )
+        markersRef.current[obstacle.id] = { polygon, listener }
+      } else {
+        // point (기본)
         const marker = new window.naver.maps.Marker({
           position: new window.naver.maps.LatLng(obstacle.lat, obstacle.lng),
           map: mapRef.current,
@@ -116,8 +229,6 @@ export default function Map({
           onMarkerClickRef.current(obstacle.id)
         )
         markersRef.current[obstacle.id] = { marker, listener }
-      } else {
-        markersRef.current[obstacle.id].marker.setIcon(createMarkerIcon(obstacle.dangerLevel))
       }
     })
   }, [obstacles, mapReady, createMarkerIcon])
@@ -164,7 +275,15 @@ export default function Map({
 
     const entry = markersRef.current[activeMarkerId]
     if (entry) {
-      infoWindowRef.current.open(mapRef.current, entry.marker)
+      // anchor 위치: marker는 marker 객체, polyline/polygon은 첫 좌표 LatLng 사용
+      if (entry.marker) {
+        infoWindowRef.current.open(mapRef.current, entry.marker)
+      } else {
+        const anchorLat = obstacle.lat ?? obstacle.coordinates?.[0]?.lat
+        const anchorLng = obstacle.lng ?? obstacle.coordinates?.[0]?.lng
+        const anchorLatLng = new window.naver.maps.LatLng(anchorLat, anchorLng)
+        infoWindowRef.current.open(mapRef.current, anchorLatLng)
+      }
     }
   }, [activeMarkerId, mapReady, allObstacles])
 
@@ -187,6 +306,14 @@ export default function Map({
           )}
         </div>
       )}
+      <DrawToolbar drawMode={drawMode} onModeChange={onDrawModeChange} />
+      <DrawStatusBar
+        drawMode={drawMode}
+        coordCount={coords?.length ?? 0}
+        onComplete={onDrawComplete}
+        onUndo={onDrawUndo}
+        onCancel={onDrawCancel}
+      />
     </div>
   )
 }
