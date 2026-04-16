@@ -1,3 +1,5 @@
+import { generateUUID } from './uuid'
+
 const STORAGE_KEY = 'obstacles'
 
 function load() {
@@ -27,7 +29,7 @@ export function create(data) {
   const now = new Date().toISOString()
   const newItem = {
     ...data,
-    id: crypto.randomUUID(),
+    id: generateUUID(),
     createdAt: now,
     updatedAt: now,
   }

@@ -1,5 +1,7 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { getAll, create, update, remove } from '../utils/storage'
+
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/
 
 describe('storage', () => {
   beforeEach(() => {
@@ -78,6 +80,63 @@ describe('storage', () => {
       const all = getAll()
       expect(all).toHaveLength(1)
       expect(all[0].id).toBe(keep.id)
+    })
+  })
+
+  describe('e2e: generateUUID 통합 검증', () => {
+    afterEach(() => {
+      vi.restoreAllMocks()
+    })
+
+    it('create()가 반환하는 id는 UUID v4 형식이다', () => {
+      const item = create({ title: 'uuid-check', lat: 37.5, lng: 126.9, category: '기타', dangerLevel: '안전', description: '' })
+      expect(item.id).toMatch(UUID_REGEX)
+    })
+
+    it('여러 항목 생성 시 id가 모두 고유하다 (UUID 충돌 없음)', () => {
+      const count = 20
+      const items = Array.from({ length: count }, (_, i) =>
+        create({ title: `item-${i}`, lat: i, lng: i, category: '기타', dangerLevel: '안전', description: '' })
+      )
+      const ids = new Set(items.map((item) => item.id))
+      expect(ids.size).toBe(count)
+    })
+
+    it('crypto.randomUUID가 없는 환경(HTTP)에서도 create()가 UUID v4 id를 생성한다', () => {
+      const originalRandomUUID = crypto.randomUUID
+      Object.defineProperty(crypto, 'randomUUID', { value: undefined, configurable: true })
+
+      const item = create({ title: 'http-env', lat: 37.5, lng: 126.9, category: '기타', dangerLevel: '안전', description: '' })
+      expect(item.id).toMatch(UUID_REGEX)
+
+      Object.defineProperty(crypto, 'randomUUID', { value: originalRandomUUID, configurable: true })
+    })
+
+    it('crypto가 완전히 없는 환경에서도 create()가 UUID v4 id를 생성한다', () => {
+      const originalCrypto = globalThis.crypto
+      Object.defineProperty(globalThis, 'crypto', { value: undefined, configurable: true, writable: true })
+
+      const item = create({ title: 'no-crypto', lat: 37.5, lng: 126.9, category: '기타', dangerLevel: '안전', description: '' })
+      expect(item.id).toMatch(UUID_REGEX)
+
+      Object.defineProperty(globalThis, 'crypto', { value: originalCrypto, configurable: true, writable: true })
+    })
+
+    it('HTTP 환경 시뮬레이션에서 생성된 항목을 update/remove로 조작할 수 있다', () => {
+      const originalRandomUUID = crypto.randomUUID
+      Object.defineProperty(crypto, 'randomUUID', { value: undefined, configurable: true })
+
+      const item = create({ title: 'http-crud', lat: 37.5, lng: 126.9, category: '기타', dangerLevel: '안전', description: '' })
+      expect(item.id).toMatch(UUID_REGEX)
+
+      Object.defineProperty(crypto, 'randomUUID', { value: originalRandomUUID, configurable: true })
+
+      const updated = update(item.id, { title: 'http-crud-updated' })
+      expect(updated.title).toBe('http-crud-updated')
+      expect(updated.id).toBe(item.id)
+
+      remove(item.id)
+      expect(getAll()).toHaveLength(0)
     })
   })
 })
