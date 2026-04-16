@@ -1,0 +1,40 @@
+.mapWrapper {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.map {
+  width: 100%;
+  height: 100%;
+}
+
+.placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg);
+  gap: 8px;
+}
+
+.placeholderText {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.placeholderHint {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.placeholderHint code {
+  font-family: 'Courier New', monospace;
+  background: var(--color-border);
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 12px;
+}
