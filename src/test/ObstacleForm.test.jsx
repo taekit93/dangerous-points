@@ -77,4 +77,71 @@ describe('ObstacleForm', () => {
     fireEvent.change(screen.getByRole('combobox'), { target: { value: '직접입력' } })
     expect(screen.getByPlaceholderText('카테고리를 입력하세요')).toBeInTheDocument()
   })
+
+  it('line 타입 formState에서 "선" 레이블과 좌표 개수가 표시된다', () => {
+    const lineFormState = {
+      mode: 'create',
+      type: 'line',
+      coordinates: [{ lat: 37.5, lng: 126.9 }, { lat: 37.6, lng: 127.0 }],
+      lat: 37.5,
+      lng: 126.9,
+    }
+    render(<ObstacleForm formState={lineFormState} onSave={vi.fn()} onClose={vi.fn()} />)
+    expect(screen.getByText('선')).toBeInTheDocument()
+    expect(screen.getByText('좌표 2개')).toBeInTheDocument()
+  })
+
+  it('polygon 타입 formState에서 "면" 레이블과 좌표 개수가 표시된다', () => {
+    const polygonFormState = {
+      mode: 'create',
+      type: 'polygon',
+      coordinates: [
+        { lat: 37.5, lng: 126.9 },
+        { lat: 37.6, lng: 127.0 },
+        { lat: 37.7, lng: 127.1 },
+      ],
+      lat: 37.5,
+      lng: 126.9,
+    }
+    render(<ObstacleForm formState={polygonFormState} onSave={vi.fn()} onClose={vi.fn()} />)
+    expect(screen.getByText('면')).toBeInTheDocument()
+    expect(screen.getByText('좌표 3개')).toBeInTheDocument()
+  })
+
+  it('line 타입 제출 시 onSave에 type과 coordinates가 포함된다', () => {
+    const onSave = vi.fn()
+    const lineFormState = {
+      mode: 'create',
+      type: 'line',
+      coordinates: [{ lat: 37.5, lng: 126.9 }, { lat: 37.6, lng: 127.0 }],
+      lat: 37.5,
+      lng: 126.9,
+    }
+    render(<ObstacleForm formState={lineFormState} onSave={onSave} onClose={vi.fn()} />)
+    fireEvent.change(screen.getByPlaceholderText('장애물 제목을 입력하세요'), {
+      target: { value: '선 장애물' },
+    })
+    fireEvent.click(screen.getByText('위험'))
+    fireEvent.click(screen.getByText('등록'))
+    expect(onSave).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'line',
+        coordinates: lineFormState.coordinates,
+        title: '선 장애물',
+      })
+    )
+  })
+
+  it('point 타입(기본) 제출 시 onSave에 type: point가 포함된다', () => {
+    const onSave = vi.fn()
+    render(<ObstacleForm formState={createFormState} onSave={onSave} onClose={vi.fn()} />)
+    fireEvent.change(screen.getByPlaceholderText('장애물 제목을 입력하세요'), {
+      target: { value: '점 장애물' },
+    })
+    fireEvent.click(screen.getByText('위험'))
+    fireEvent.click(screen.getByText('등록'))
+    expect(onSave).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'point' })
+    )
+  })
 })

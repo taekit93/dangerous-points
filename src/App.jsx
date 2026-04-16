@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react'
 import { useObstacles } from './hooks/useObstacles'
+import { useDrawing } from './hooks/useDrawing'
 import Header from './components/Header'
 import FilterBar from './components/FilterBar'
 import Map from './components/Map'
@@ -9,6 +10,7 @@ import styles from './App.module.css'
 
 export default function App() {
   const { obstacles, addObstacle, updateObstacle, removeObstacle } = useObstacles()
+  const { drawMode, coords, setDrawMode, addCoord, undoCoord, resetDrawing } = useDrawing()
   const [selectedCategories, setSelectedCategories] = useState([])
   const [selectedDangerLevels, setSelectedDangerLevels] = useState([])
   const [formState, setFormState] = useState(null)
@@ -25,8 +27,32 @@ export default function App() {
   })
 
   function handleMapClick({ lat, lng }) {
-    setFormState({ mode: 'create', lat, lng })
-    setActiveMarkerId(null)
+    if (drawMode === 'point') {
+      setFormState({ mode: 'create', lat, lng })
+      setActiveMarkerId(null)
+    } else {
+      addCoord({ lat, lng })
+    }
+  }
+
+  function handleDrawComplete() {
+    if (coords.length === 0) return
+    setFormState({
+      mode: 'create',
+      type: drawMode,
+      coordinates: coords,
+      lat: coords[0].lat,
+      lng: coords[0].lng,
+    })
+    resetDrawing()
+  }
+
+  function handleDrawCancel() {
+    resetDrawing()
+  }
+
+  function handleDrawModeChange(mode) {
+    setDrawMode(mode)
   }
 
   function handleMarkerClick(id) {
@@ -34,7 +60,11 @@ export default function App() {
     setFormState(null)
     const obstacle = obstacles.find((o) => o.id === id)
     if (obstacle && mapRef.current) {
-      mapRef.current.panTo(new window.naver.maps.LatLng(obstacle.lat, obstacle.lng))
+      const lat = obstacle.lat ?? obstacle.coordinates?.[0]?.lat
+      const lng = obstacle.lng ?? obstacle.coordinates?.[0]?.lng
+      if (lat != null && lng != null) {
+        mapRef.current.panTo(new window.naver.maps.LatLng(lat, lng))
+      }
     }
   }
 
@@ -59,9 +89,11 @@ export default function App() {
     if (window.confirm('이 장애물을 삭제하시겠습니까?')) {
       removeObstacle(id)
       if (markersRef.current[id]) {
-        const { marker, listener } = markersRef.current[id]
-        window.naver.maps.Event.removeListener(listener)
-        marker.setMap(null)
+        const entry = markersRef.current[id]
+        window.naver.maps.Event.removeListener(entry.listener)
+        if (entry.marker) entry.marker.setMap(null)
+        if (entry.polyline) entry.polyline.setMap(null)
+        if (entry.polygon) entry.polygon.setMap(null)
         delete markersRef.current[id]
       }
       setActiveMarkerId(null)
@@ -118,6 +150,12 @@ export default function App() {
           onCloseInfoWindow={handleCloseInfoWindow}
           onEditObstacle={handleEditObstacle}
           onDeleteObstacle={handleDeleteObstacle}
+          coords={coords}
+          drawMode={drawMode}
+          onDrawModeChange={handleDrawModeChange}
+          onDrawComplete={handleDrawComplete}
+          onDrawUndo={undoCoord}
+          onDrawCancel={handleDrawCancel}
         />
 
         <div className={`${styles.bottomSheet} ${isSheetOpen ? styles.sheetOpen : ''}`}>

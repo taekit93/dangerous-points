@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { DANGER_COLORS, DANGER_BG_COLORS } from '../constants/categories'
 import styles from './MarkerList.module.css'
 
+const TYPE_LABEL = { point: '점', line: '선', polygon: '면' }
+
 export default function MarkerList({ obstacles, activeMarkerId, onSelect, onDelete }) {
   const [searchQuery, setSearchQuery] = useState('')
 
@@ -41,6 +43,9 @@ export default function MarkerList({ obstacles, activeMarkerId, onSelect, onDele
               <div className={styles.itemContent}>
                 <div className={styles.itemTop}>
                   <span className={styles.itemTitle}>{obstacle.title}</span>
+                  <span className={styles.typeBadge}>
+                    {TYPE_LABEL[obstacle.type] ?? '점'}
+                  </span>
                   <span
                     className={styles.dangerBadge}
                     style={{

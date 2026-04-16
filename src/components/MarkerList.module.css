@@ -88,6 +88,16 @@
   flex: 1;
 }
 
+.typeBadge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 5px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+  background: var(--color-border);
+  color: var(--color-text-secondary);
+}
+
 .dangerBadge {
   font-size: 10px;
   font-weight: 700;
