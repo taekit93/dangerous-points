@@ -1,0 +1,206 @@
+/* WishlistList — MarkerList 패턴 기반 */
+
+.wishlistList {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.searchBox {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 7px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  background: var(--color-bg);
+  color: var(--color-text-primary);
+  outline: none;
+  transition: border-color var(--transition);
+  font-family: inherit;
+}
+
+.searchInput:focus {
+  border-color: var(--color-border-focus);
+}
+
+/* ── 필터 바 ─────────────────────── */
+.filterBar {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.filterRow {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.filterRow::-webkit-scrollbar {
+  display: none;
+}
+
+.filterChip {
+  padding: 4px 11px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid var(--color-border);
+  background: var(--color-card);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all var(--transition);
+  font-family: inherit;
+  flex-shrink: 0;
+}
+
+.filterChip:hover {
+  border-color: #BFDBFE;
+  color: #3B82F6;
+}
+
+/* 카테고리 필터 활성 */
+.chipActive {
+  background: #EFF6FF;
+  border-color: #BFDBFE;
+  color: #3B82F6;
+}
+
+/* 방문완료 필터 활성 */
+.chipVisitActive {
+  background: #FFFBEB;
+  border-color: #FDE68A;
+  color: #F59E0B;
+}
+
+/* ── 목록 ─────────────────────────── */
+.empty {
+  padding: 32px 12px;
+  text-align: center;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+}
+
+.list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 12px;
+  border-bottom: 1px solid var(--color-border);
+  cursor: pointer;
+  transition: background var(--transition);
+  position: relative;
+}
+
+.item:hover {
+  background: var(--color-bg);
+}
+
+.item:focus-visible {
+  outline: 2px solid #3B82F6;
+  outline-offset: -2px;
+}
+
+.itemVisited {
+  /* 방문 완료 아이템은 별도 스타일 없음 — 배지로 구분 */
+}
+
+/* ── 아이템 아이콘 ─────────────────── */
+.itemIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  background: #EFF6FF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.itemVisited .itemIcon {
+  background: #FFFBEB;
+}
+
+/* ── 아이템 콘텐츠 ─────────────────── */
+.itemContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.itemTop {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 3px;
+}
+
+.itemName {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+
+/* 카테고리 배지 */
+.categoryBadge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: var(--radius-full);
+  background: #EFF6FF;
+  color: #3B82F6;
+  flex-shrink: 0;
+}
+
+/* 방문 횟수 배지 */
+.visitCountBadge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: var(--radius-full);
+  background: #FFFBEB;
+  color: #F59E0B;
+  flex-shrink: 0;
+}
+
+.badgeUnvisited {
+  background: var(--color-bg);
+  color: var(--color-text-secondary);
+}
+
+/* 메타 */
+.itemMeta {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.itemAddress {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

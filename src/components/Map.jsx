@@ -21,12 +21,15 @@ export default function Map({
   onDrawComplete,
   onDrawUndo,
   onDrawCancel,
+  wishlistItems = [],
+  onWishlistItemClick,
 }) {
   const mapContainerRef = useRef(null)
   const [mapReady, setMapReady] = useState(false)
   const infoWindowRef = useRef(null)
   const previewPolylineRef = useRef(null)
   const previewPolygonRef = useRef(null)
+  const wishlistMarkersRef = useRef({})
 
   // C-1: 외부 콜백을 ref로 감싸 최신 참조 유지
   const onMapClickRef = useRef(onMapClick)
@@ -34,12 +37,14 @@ export default function Map({
   const onCloseInfoWindowRef = useRef(onCloseInfoWindow)
   const onEditObstacleRef = useRef(onEditObstacle)
   const onDeleteObstacleRef = useRef(onDeleteObstacle)
+  const onWishlistItemClickRef = useRef(onWishlistItemClick)
 
   useEffect(() => { onMapClickRef.current = onMapClick }, [onMapClick])
   useEffect(() => { onMarkerClickRef.current = onMarkerClick }, [onMarkerClick])
   useEffect(() => { onCloseInfoWindowRef.current = onCloseInfoWindow }, [onCloseInfoWindow])
   useEffect(() => { onEditObstacleRef.current = onEditObstacle }, [onEditObstacle])
   useEffect(() => { onDeleteObstacleRef.current = onDeleteObstacle }, [onDeleteObstacle])
+  useEffect(() => { onWishlistItemClickRef.current = onWishlistItemClick }, [onWishlistItemClick])
 
   const createMarkerIcon = useCallback((dangerLevel) => {
     const color = DANGER_COLORS[dangerLevel] || '#999'
@@ -51,6 +56,18 @@ export default function Map({
       url: `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`,
       size: new window.naver.maps.Size(32, 40),
       anchor: new window.naver.maps.Point(16, 40),
+    }
+  }, [])
+
+  const createWishlistMarkerIcon = useCallback((visitCount) => {
+    const color = visitCount > 0 ? '#F59E0B' : '#3B82F6'
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36">
+      <polygon points="18,2 22.5,13 34,13 25,20.5 28.5,32 18,25 7.5,32 11,20.5 2,13 13.5,13" fill="${color}" stroke="white" stroke-width="1.5"/>
+    </svg>`
+    return {
+      url: `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`,
+      size: new window.naver.maps.Size(36, 36),
+      anchor: new window.naver.maps.Point(18, 18),
     }
   }, [])
 
@@ -288,6 +305,41 @@ export default function Map({
       }
     }
   }, [activeMarkerId, mapReady, allObstacles])
+
+  // 위시리스트 마커 동기화
+  useEffect(() => {
+    if (!mapReady || !mapRef.current) return
+
+    // 현재 wishlistItems에 없는 마커 제거
+    Object.entries(wishlistMarkersRef.current).forEach(([id, entry]) => {
+      const exists = wishlistItems.some((item) => item.id === id)
+      if (!exists) {
+        window.naver.maps.Event.removeListener(entry.listener)
+        entry.marker.setMap(null)
+        delete wishlistMarkersRef.current[id]
+      }
+    })
+
+    wishlistItems.forEach((item) => {
+      if (wishlistMarkersRef.current[item.id]) {
+        // 아이콘 업데이트 (visitCount 변경 반영)
+        wishlistMarkersRef.current[item.id].marker.setIcon(
+          createWishlistMarkerIcon(item.visitCount)
+        )
+        return
+      }
+
+      const marker = new window.naver.maps.Marker({
+        position: new window.naver.maps.LatLng(item.lat, item.lng),
+        map: mapRef.current,
+        icon: createWishlistMarkerIcon(item.visitCount),
+      })
+      const listener = window.naver.maps.Event.addListener(marker, 'click', () =>
+        onWishlistItemClickRef.current?.(item.id)
+      )
+      wishlistMarkersRef.current[item.id] = { marker, listener }
+    })
+  }, [wishlistItems, mapReady, createWishlistMarkerIcon])
 
   return (
     <div className={styles.mapWrapper}>

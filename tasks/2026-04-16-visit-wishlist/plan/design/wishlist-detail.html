@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WishlistDetail — 방문 위시리스트 디자인 프리뷰</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="preview-nav">
+    <h1>방문 위시리스트 UI 컴포넌트 프리뷰</h1>
+    <nav>
+      <a href="index.html">인덱스</a>
+      <a href="header.html">Header (탭 추가)</a>
+      <a href="wishlist-form.html">WishlistForm</a>
+      <a href="wishlist-list.html">WishlistList</a>
+      <a href="wishlist-detail.html" class="active">WishlistDetail</a>
+    </nav>
+  </div>
+
+  <main class="preview-main">
+
+    <!-- ── 미방문 상태 ─── -->
+    <section>
+      <h2>WishlistDetail — 미방문</h2>
+      <div class="component-section">
+        <div class="component-section-title">visitCount = 0</div>
+        <div class="component-section-body demo-box">
+          <div class="demo-modal-wrap">
+            <div class="detail-panel" style="animation:none">
+              <!-- 헤더 -->
+              <div class="detail-header">
+                <div class="detail-title-wrap">
+                  <h2 class="detail-title">국립현대미술관 서울관</h2>
+                  <div class="detail-badges">
+                    <span class="category-badge">문화/예술</span>
+                    <span class="visit-count-badge badge-unvisited">미방문</span>
+                  </div>
+                </div>
+                <button class="form-close-btn" aria-label="닫기">✕</button>
+              </div>
+
+              <!-- 본문 -->
+              <div class="detail-body">
+                <!-- 주소 -->
+                <div class="detail-address">
+                  <span class="detail-address-icon">📍</span>
+                  <span>서울 종로구 삼청로 30</span>
+                </div>
+
+                <!-- 방문 카드 — 미방문 -->
+                <div class="visit-card" style="background:var(--color-unvisited-bg); border-color:var(--color-border)">
+                  <div class="visit-card-info">
+                    <span class="visit-card-count" style="color:var(--color-unvisited)">0회</span>
+                    <span class="visit-card-label">아직 방문하지 않았습니다</span>
+                  </div>
+                  <button class="btn-visit">방문 완료</button>
+                </div>
+
+                <!-- 후기 섹션 -->
+                <div class="review-section">
+                  <div class="review-section-title">후기</div>
+                  <div class="review-form">
+                    <textarea class="form-textarea" rows="3" placeholder="방문 후기를 작성해 주세요 (선택)"></textarea>
+                    <div class="review-form-row">
+                      <select class="form-select" disabled style="opacity:0.5; cursor:not-allowed">
+                        <option>방문 번호 선택 (선택)</option>
+                      </select>
+                      <button class="btn-review-submit" disabled style="opacity:0.5; cursor:not-allowed">등록</button>
+                    </div>
+                    <p style="font-size:11px; color:var(--color-text-secondary)">방문 완료 후 후기를 등록할 수 있습니다.</p>
+                  </div>
+                  <div class="wishlist-empty" style="padding:16px 0">
+                    아직 작성된 후기가 없습니다.
+                  </div>
+                </div>
+              </div>
+
+              <!-- 하단 버튼 -->
+              <div class="detail-footer">
+                <button class="btn-detail-delete">삭제</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 방문 완료 상태 (후기 있음) ─── -->
+    <section>
+      <h2>WishlistDetail — 방문 완료 (후기 있음)</h2>
+      <div class="component-section">
+        <div class="component-section-title">visitCount = 3, reviews 2개</div>
+        <div class="component-section-body demo-box">
+          <div class="demo-modal-wrap">
+            <div class="detail-panel" style="animation:none">
+              <!-- 헤더 -->
+              <div class="detail-header">
+                <div class="detail-title-wrap">
+                  <h2 class="detail-title">을지면옥</h2>
+                  <div class="detail-badges">
+                    <span class="category-badge">맛집</span>
+                    <span class="visit-count-badge">3회 방문</span>
+                  </div>
+                </div>
+                <button class="form-close-btn" aria-label="닫기">✕</button>
+              </div>
+
+              <!-- 본문 -->
+              <div class="detail-body">
+                <!-- 주소 -->
+                <div class="detail-address">
+                  <span class="detail-address-icon">📍</span>
+                  <span>서울 중구 을지로 6가 18-12</span>
+                </div>
+
+                <!-- 방문 카드 -->
+                <div class="visit-card">
+                  <div class="visit-card-info">
+                    <span class="visit-card-count">3회</span>
+                    <span class="visit-card-label">방문 완료</span>
+                  </div>
+                  <button class="btn-visit">방문 완료</button>
+                </div>
+
+                <!-- 후기 섹션 -->
+                <div class="review-section">
+                  <div class="review-section-title">후기</div>
+
+                  <!-- 후기 작성 폼 -->
+                  <div class="review-form">
+                    <textarea class="form-textarea" rows="3" placeholder="방문 후기를 작성해 주세요 (선택)"></textarea>
+                    <div class="review-form-row">
+                      <select class="form-select">
+                        <option value="">방문 번호 선택 (선택)</option>
+                        <option value="1">1번째 방문</option>
+                        <option value="2">2번째 방문</option>
+                        <option value="3">3번째 방문</option>
+                      </select>
+                      <button class="btn-review-submit">등록</button>
+                    </div>
+                  </div>
+
+                  <!-- 후기 목록 -->
+                  <ul class="review-list">
+                    <li class="review-item">
+                      <div class="review-item-meta">
+                        <span class="review-visit-num">3번째 방문</span>
+                        <span>2026-04-10</span>
+                      </div>
+                      <p class="review-item-text">대기가 길지만 충분히 기다릴 만합니다. 냉면 국물이 정말 일품이고 특히 여름에 더 생각날 것 같아요.</p>
+                      <div class="review-item-actions">
+                        <button class="btn-text-sm">수정</button>
+                        <button class="btn-text-sm btn-delete">삭제</button>
+                      </div>
+                    </li>
+                    <li class="review-item">
+                      <div class="review-item-meta">
+                        <span class="review-visit-num">1번째 방문</span>
+                        <span>2025-08-22</span>
+                      </div>
+                      <p class="review-item-text">처음 방문. 갈비찜도 같이 시켰는데 두 메뉴 모두 만족스러웠습니다.</p>
+                      <div class="review-item-actions">
+                        <button class="btn-text-sm">수정</button>
+                        <button class="btn-text-sm btn-delete">삭제</button>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <!-- 하단 버튼 -->
+              <div class="detail-footer">
+                <button class="btn-detail-delete">삭제</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Props 인터페이스 ─── -->
+    <section>
+      <h2>Props 인터페이스</h2>
+      <div class="component-section">
+        <div class="component-section-title">WishlistDetail.jsx</div>
+        <div class="component-section-body">
+          <pre style="font-size:13px; line-height:1.7; color:#1A1A2E; background:#F5F7FA; padding:16px; border-radius:8px; overflow-x:auto">
+interface WishlistDetailProps {
+  item       : WishlistDetailItem                    // 상세 데이터
+  onVisit    : (id: string) => void                  // "방문 완료" 버튼 클릭 → visitCount++
+  onAddReview: (id: string, review: ReviewInput) => void  // 후기 등록
+  onDelete   : (id: string) => void                  // 장소 삭제
+  onClose    : () => void                            // 패널 닫기
+}
+
+interface WishlistDetailItem {
+  id         : string
+  name       : string
+  category   : WishlistCategory
+  address   ?: string
+  lat        : number
+  lng        : number
+  visitCount : number
+  reviews    : Review[]
+  createdAt  : string
+}
+
+interface Review {
+  id        : string
+  text      : string
+  visitNum ?: number    // 몇 번째 방문 후기인지 (선택)
+  createdAt : string
+}
+
+interface ReviewInput {
+  text     : string
+  visitNum?: number
+}
+          </pre>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</body>
+</html>

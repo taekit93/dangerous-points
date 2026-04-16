@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WishlistList — 방문 위시리스트 디자인 프리뷰</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="preview-nav">
+    <h1>방문 위시리스트 UI 컴포넌트 프리뷰</h1>
+    <nav>
+      <a href="index.html">인덱스</a>
+      <a href="header.html">Header (탭 추가)</a>
+      <a href="wishlist-form.html">WishlistForm</a>
+      <a href="wishlist-list.html" class="active">WishlistList</a>
+      <a href="wishlist-detail.html">WishlistDetail</a>
+    </nav>
+  </div>
+
+  <main class="preview-main">
+
+    <!-- ── 목록 기본 상태 ─── -->
+    <section>
+      <h2>WishlistList — 기본 목록</h2>
+      <div class="component-section">
+        <div class="component-section-title">items 있는 상태</div>
+        <div class="component-section-body demo-box">
+          <div class="demo-sidebar">
+            <div class="wishlist-list">
+              <!-- 검색 -->
+              <div class="wishlist-search-box">
+                <input class="wishlist-search-input" type="text" placeholder="장소 검색..." />
+              </div>
+
+              <!-- 카테고리 필터 -->
+              <div class="wishlist-filter-bar">
+                <div class="wishlist-filter-row" role="group" aria-label="카테고리 필터">
+                  <button class="filter-chip chip-active">전체</button>
+                  <button class="filter-chip">맛집</button>
+                  <button class="filter-chip">카페</button>
+                  <button class="filter-chip">관광지</button>
+                  <button class="filter-chip">공원</button>
+                  <button class="filter-chip">쇼핑</button>
+                  <button class="filter-chip">문화/예술</button>
+                  <button class="filter-chip">기타</button>
+                </div>
+                <!-- 방문 여부 필터 -->
+                <div class="wishlist-filter-row" role="group" aria-label="방문 여부 필터">
+                  <button class="filter-chip chip-active">전체</button>
+                  <button class="filter-chip">미방문</button>
+                  <button class="filter-chip">방문완료</button>
+                </div>
+              </div>
+
+              <!-- 목록 -->
+              <ul class="wishlist-list-body">
+                <!-- 아이템 1: 방문 완료 -->
+                <li class="wishlist-item item-visited" role="button" tabindex="0">
+                  <div class="wishlist-item-icon" aria-hidden="true">🍜</div>
+                  <div class="wishlist-item-content">
+                    <div class="wishlist-item-top">
+                      <span class="wishlist-item-name">을지면옥</span>
+                      <span class="category-badge">맛집</span>
+                      <span class="visit-count-badge">3회 방문</span>
+                    </div>
+                    <div class="wishlist-item-meta">
+                      <span class="wishlist-item-address">서울 중구 을지로 6가</span>
+                    </div>
+                  </div>
+                </li>
+
+                <!-- 아이템 2: 활성(선택됨) -->
+                <li class="wishlist-item item-active" role="button" tabindex="0">
+                  <div class="wishlist-item-icon" aria-hidden="true">☕</div>
+                  <div class="wishlist-item-content">
+                    <div class="wishlist-item-top">
+                      <span class="wishlist-item-name">오르에르 커피</span>
+                      <span class="category-badge">카페</span>
+                      <span class="visit-count-badge">1회 방문</span>
+                    </div>
+                    <div class="wishlist-item-meta">
+                      <span class="wishlist-item-address">서울 마포구 연남동</span>
+                    </div>
+                  </div>
+                </li>
+
+                <!-- 아이템 3: 미방문 -->
+                <li class="wishlist-item" role="button" tabindex="0">
+                  <div class="wishlist-item-icon" aria-hidden="true">🏛</div>
+                  <div class="wishlist-item-content">
+                    <div class="wishlist-item-top">
+                      <span class="wishlist-item-name">국립현대미술관 서울관</span>
+                      <span class="category-badge">문화/예술</span>
+                      <span class="visit-count-badge badge-unvisited">미방문</span>
+                    </div>
+                    <div class="wishlist-item-meta">
+                      <span class="wishlist-item-address">서울 종로구 삼청로 30</span>
+                    </div>
+                  </div>
+                </li>
+
+                <!-- 아이템 4: 미방문 -->
+                <li class="wishlist-item" role="button" tabindex="0">
+                  <div class="wishlist-item-icon" aria-hidden="true">🌳</div>
+                  <div class="wishlist-item-content">
+                    <div class="wishlist-item-top">
+                      <span class="wishlist-item-name">서울숲</span>
+                      <span class="category-badge">공원</span>
+                      <span class="visit-count-badge badge-unvisited">미방문</span>
+                    </div>
+                    <div class="wishlist-item-meta">
+                      <span class="wishlist-item-address">서울 성동구 뚝섬로 273</span>
+                    </div>
+                  </div>
+                </li>
+
+                <!-- 아이템 5: 방문 완료 -->
+                <li class="wishlist-item item-visited" role="button" tabindex="0">
+                  <div class="wishlist-item-icon" aria-hidden="true">🛍</div>
+                  <div class="wishlist-item-content">
+                    <div class="wishlist-item-top">
+                      <span class="wishlist-item-name">더현대 서울</span>
+                      <span class="category-badge">쇼핑</span>
+                      <span class="visit-count-badge">2회 방문</span>
+                    </div>
+                    <div class="wishlist-item-meta">
+                      <span class="wishlist-item-address">서울 영등포구 여의대로 108</span>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 카테고리 필터 활성 ─── -->
+    <section>
+      <h2>WishlistList — 카테고리 필터 활성</h2>
+      <div class="component-section">
+        <div class="component-section-title">카테고리 "카페" 선택 + 방문여부 "미방문" 선택</div>
+        <div class="component-section-body demo-box">
+          <div class="demo-sidebar">
+            <div class="wishlist-list">
+              <div class="wishlist-search-box">
+                <input class="wishlist-search-input" type="text" placeholder="장소 검색..." />
+              </div>
+              <div class="wishlist-filter-bar">
+                <div class="wishlist-filter-row">
+                  <button class="filter-chip">전체</button>
+                  <button class="filter-chip">맛집</button>
+                  <button class="filter-chip chip-active">카페</button>
+                  <button class="filter-chip">관광지</button>
+                  <button class="filter-chip">공원</button>
+                  <button class="filter-chip">쇼핑</button>
+                  <button class="filter-chip">문화/예술</button>
+                  <button class="filter-chip">기타</button>
+                </div>
+                <div class="wishlist-filter-row">
+                  <button class="filter-chip">전체</button>
+                  <button class="filter-chip chip-visit-active">미방문</button>
+                  <button class="filter-chip">방문완료</button>
+                </div>
+              </div>
+              <ul class="wishlist-list-body">
+                <li class="wishlist-item" role="button" tabindex="0">
+                  <div class="wishlist-item-icon">☕</div>
+                  <div class="wishlist-item-content">
+                    <div class="wishlist-item-top">
+                      <span class="wishlist-item-name">프릳츠 커피</span>
+                      <span class="category-badge">카페</span>
+                      <span class="visit-count-badge badge-unvisited">미방문</span>
+                    </div>
+                    <div class="wishlist-item-meta">
+                      <span class="wishlist-item-address">서울 마포구 도화동</span>
+                    </div>
+                  </div>
+                </li>
+                <li class="wishlist-item" role="button" tabindex="0">
+                  <div class="wishlist-item-icon">☕</div>
+                  <div class="wishlist-item-content">
+                    <div class="wishlist-item-top">
+                      <span class="wishlist-item-name">커피리브레 연남점</span>
+                      <span class="category-badge">카페</span>
+                      <span class="visit-count-badge badge-unvisited">미방문</span>
+                    </div>
+                    <div class="wishlist-item-meta">
+                      <span class="wishlist-item-address">서울 마포구 연남동</span>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 빈 상태 ─── -->
+    <section>
+      <h2>WishlistList — 빈 상태</h2>
+      <div class="component-section">
+        <div class="component-section-title">items 없거나 검색 결과 없음</div>
+        <div class="component-section-body demo-box">
+          <div class="demo-sidebar" style="height:300px">
+            <div class="wishlist-list">
+              <div class="wishlist-search-box">
+                <input class="wishlist-search-input" type="text" placeholder="장소 검색..." value="존재하지않는장소" />
+              </div>
+              <div class="wishlist-filter-bar">
+                <div class="wishlist-filter-row">
+                  <button class="filter-chip chip-active">전체</button>
+                  <button class="filter-chip">맛집</button>
+                  <button class="filter-chip">카페</button>
+                </div>
+                <div class="wishlist-filter-row">
+                  <button class="filter-chip chip-active">전체</button>
+                  <button class="filter-chip">미방문</button>
+                  <button class="filter-chip">방문완료</button>
+                </div>
+              </div>
+              <div class="wishlist-empty">
+                검색 결과가 없습니다.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Props 인터페이스 ─── -->
+    <section>
+      <h2>Props 인터페이스</h2>
+      <div class="component-section">
+        <div class="component-section-title">WishlistList.jsx</div>
+        <div class="component-section-body">
+          <pre style="font-size:13px; line-height:1.7; color:#1A1A2E; background:#F5F7FA; padding:16px; border-radius:8px; overflow-x:auto">
+interface WishlistListProps {
+  items      : WishlistListItem[]          // 전체 위시리스트 아이템
+  onItemClick: (id: string) => void        // 아이템 클릭 시 상세 열기
+}
+
+interface WishlistListItem {
+  id          : string
+  name        : string
+  category    : WishlistCategory
+  address    ?: string
+  lat         : number
+  lng         : number
+  visitCount  : number          // 0이면 미방문
+  createdAt   : string          // ISO 날짜
+}
+          </pre>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</body>
+</html>

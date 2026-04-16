@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>방문 위시리스트 — 디자인 프리뷰</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="preview-nav">
+    <h1>방문 위시리스트 UI 컴포넌트 프리뷰</h1>
+    <nav>
+      <a href="index.html" class="active">인덱스</a>
+      <a href="header.html">Header (탭 추가)</a>
+      <a href="wishlist-form.html">WishlistForm</a>
+      <a href="wishlist-list.html">WishlistList</a>
+      <a href="wishlist-detail.html">WishlistDetail</a>
+    </nav>
+  </div>
+
+  <main class="preview-main">
+    <section class="component-overview">
+      <h2>컴포넌트 목록</h2>
+      <div class="card-grid">
+        <a href="header.html" class="card">
+          <div class="card-icon">H</div>
+          <div class="card-body">
+            <h3>Header</h3>
+            <p>장애물 | 위시리스트 모드 전환 탭 추가</p>
+            <code>activeMode, onModeChange, count, onToggleSidebar</code>
+          </div>
+        </a>
+        <a href="wishlist-form.html" class="card">
+          <div class="card-icon">F</div>
+          <div class="card-body">
+            <h3>WishlistForm</h3>
+            <p>위시리스트 장소 등록 폼</p>
+            <code>position, onSave, onCancel</code>
+          </div>
+        </a>
+        <a href="wishlist-list.html" class="card">
+          <div class="card-icon">L</div>
+          <div class="card-body">
+            <h3>WishlistList</h3>
+            <p>검색·필터 포함 위시리스트 목록</p>
+            <code>items, onItemClick</code>
+          </div>
+        </a>
+        <a href="wishlist-detail.html" class="card">
+          <div class="card-icon">D</div>
+          <div class="card-body">
+            <h3>WishlistDetail</h3>
+            <p>장소 상세 + 방문 기록 + 후기</p>
+            <code>item, onVisit, onAddReview, onDelete, onClose</code>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <section class="design-tokens">
+      <h2>디자인 토큰</h2>
+      <div class="token-grid">
+        <div class="token-item">
+          <div class="swatch" style="background:#2D3E50"></div>
+          <span>--color-primary<br/>#2D3E50</span>
+        </div>
+        <div class="token-item">
+          <div class="swatch" style="background:#3B82F6"></div>
+          <span>위시리스트 강조<br/>#3B82F6</span>
+        </div>
+        <div class="token-item">
+          <div class="swatch" style="background:#F59E0B"></div>
+          <span>방문 완료<br/>#F59E0B</span>
+        </div>
+        <div class="token-item">
+          <div class="swatch" style="background:#F5F7FA"></div>
+          <span>--color-bg<br/>#F5F7FA</span>
+        </div>
+        <div class="token-item">
+          <div class="swatch" style="background:#FFFFFF; border:1px solid #E0E0E0"></div>
+          <span>--color-card<br/>#FFFFFF</span>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

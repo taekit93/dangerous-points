@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WishlistForm — 방문 위시리스트 디자인 프리뷰</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="preview-nav">
+    <h1>방문 위시리스트 UI 컴포넌트 프리뷰</h1>
+    <nav>
+      <a href="index.html">인덱스</a>
+      <a href="header.html">Header (탭 추가)</a>
+      <a href="wishlist-form.html" class="active">WishlistForm</a>
+      <a href="wishlist-list.html">WishlistList</a>
+      <a href="wishlist-detail.html">WishlistDetail</a>
+    </nav>
+  </div>
+
+  <main class="preview-main">
+
+    <!-- ── 등록 모드 ─── -->
+    <section>
+      <h2>WishlistForm — 등록 모드</h2>
+      <div class="component-section">
+        <div class="component-section-title">신규 장소 등록 (지도 클릭 후 폼 열림)</div>
+        <div class="component-section-body demo-box">
+          <div class="demo-modal-wrap">
+            <div class="form-panel" style="animation:none">
+              <div class="form-panel-header">
+                <h2 class="form-panel-title">장소 등록</h2>
+                <button class="form-close-btn" aria-label="닫기">✕</button>
+              </div>
+
+              <!-- 좌표 표시 -->
+              <div class="form-coords">
+                <span class="form-coords-label">위치</span>
+                <span class="form-coords-value">37.56580, 126.97845</span>
+              </div>
+
+              <form class="form-body">
+                <!-- 장소명 -->
+                <div class="form-field">
+                  <label class="form-label">장소명 <span class="form-required">*</span></label>
+                  <input class="form-input" type="text" placeholder="장소 이름을 입력하세요" value="" autocomplete="off" />
+                </div>
+
+                <!-- 카테고리 -->
+                <div class="form-field">
+                  <label class="form-label">카테고리 <span class="form-required">*</span></label>
+                  <select class="form-select">
+                    <option value="">카테고리 선택</option>
+                    <option value="restaurant">맛집</option>
+                    <option value="cafe">카페</option>
+                    <option value="attraction">관광지</option>
+                    <option value="park">공원</option>
+                    <option value="shopping">쇼핑</option>
+                    <option value="culture">문화/예술</option>
+                    <option value="etc">기타</option>
+                  </select>
+                </div>
+
+                <!-- 주소 -->
+                <div class="form-field">
+                  <label class="form-label">주소 <span style="font-weight:400; color:var(--color-text-secondary)">(선택)</span></label>
+                  <input class="form-input" type="text" placeholder="주소 입력 (선택)" value="" autocomplete="off" />
+                </div>
+
+                <!-- 위도/경도 읽기전용 -->
+                <div class="form-field">
+                  <label class="form-label">위도 / 경도</label>
+                  <div style="display:flex; gap:8px">
+                    <input class="form-input form-input--readonly" type="text" value="37.56580" readonly tabindex="-1" />
+                    <input class="form-input form-input--readonly" type="text" value="126.97845" readonly tabindex="-1" />
+                  </div>
+                </div>
+
+                <!-- 버튼 -->
+                <div class="form-actions">
+                  <button type="button" class="btn-cancel">취소</button>
+                  <button type="submit" class="btn-save">등록</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 유효성 검증 오류 상태 ─── -->
+    <section>
+      <h2>WishlistForm — 유효성 검증 오류</h2>
+      <div class="component-section">
+        <div class="component-section-title">필수 입력 누락 시 오류 표시</div>
+        <div class="component-section-body demo-box">
+          <div class="demo-modal-wrap">
+            <div class="form-panel" style="animation:none">
+              <div class="form-panel-header">
+                <h2 class="form-panel-title">장소 등록</h2>
+                <button class="form-close-btn" aria-label="닫기">✕</button>
+              </div>
+              <div class="form-coords">
+                <span class="form-coords-label">위치</span>
+                <span class="form-coords-value">37.56580, 126.97845</span>
+              </div>
+              <form class="form-body">
+                <div class="form-field">
+                  <label class="form-label">장소명 <span class="form-required">*</span></label>
+                  <input class="form-input form-input--error" type="text" placeholder="장소 이름을 입력하세요" value="" autocomplete="off" />
+                  <span class="form-error-msg">장소명을 입력해 주세요.</span>
+                </div>
+                <div class="form-field">
+                  <label class="form-label">카테고리 <span class="form-required">*</span></label>
+                  <select class="form-select" style="border-color:var(--color-danger)">
+                    <option value="">카테고리 선택</option>
+                    <option>맛집</option>
+                    <option>카페</option>
+                    <option>관광지</option>
+                    <option>공원</option>
+                    <option>쇼핑</option>
+                    <option>문화/예술</option>
+                    <option>기타</option>
+                  </select>
+                  <span class="form-error-msg">카테고리를 선택해 주세요.</span>
+                </div>
+                <div class="form-field">
+                  <label class="form-label">주소</label>
+                  <input class="form-input" type="text" placeholder="주소 입력 (선택)" />
+                </div>
+                <div class="form-field">
+                  <label class="form-label">위도 / 경도</label>
+                  <div style="display:flex; gap:8px">
+                    <input class="form-input form-input--readonly" type="text" value="37.56580" readonly />
+                    <input class="form-input form-input--readonly" type="text" value="126.97845" readonly />
+                  </div>
+                </div>
+                <div class="form-actions">
+                  <button type="button" class="btn-cancel">취소</button>
+                  <button type="submit" class="btn-save">등록</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Props 인터페이스 ─── -->
+    <section>
+      <h2>Props 인터페이스</h2>
+      <div class="component-section">
+        <div class="component-section-title">WishlistForm.jsx</div>
+        <div class="component-section-body">
+          <pre style="font-size:13px; line-height:1.7; color:#1A1A2E; background:#F5F7FA; padding:16px; border-radius:8px; overflow-x:auto">
+interface WishlistFormProps {
+  position : { lat: number; lng: number }  // 지도 클릭 좌표 (필수)
+  onSave   : (data: WishlistItem) => void   // 저장 시 호출
+  onCancel : () => void                     // 취소 시 호출
+}
+
+interface WishlistItem {
+  name     : string                // 장소명
+  category : WishlistCategory      // 카테고리
+  address ?: string                // 주소 (선택)
+  lat      : number                // 위도
+  lng      : number                // 경도
+}
+
+type WishlistCategory =
+  | '맛집' | '카페' | '관광지' | '공원'
+  | '쇼핑' | '문화/예술' | '기타'
+          </pre>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</body>
+</html>
