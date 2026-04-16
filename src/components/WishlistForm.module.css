@@ -1,0 +1,233 @@
+/* WishlistForm — ObstacleForm 패턴 기반, 위시리스트 강조색 적용 */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 1000;
+}
+
+@media (min-width: 640px) {
+  .overlay {
+    align-items: center;
+    padding: 16px;
+  }
+}
+
+.panel {
+  background: var(--color-card);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+  animation: slideUp 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (min-width: 640px) {
+  .panel {
+    border-radius: var(--radius-lg);
+    animation: fadeIn 0.2s ease;
+  }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.panelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px 0;
+}
+
+.panelTitle {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.closeBtn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--color-bg);
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  transition: background var(--transition);
+  cursor: pointer;
+  border: none;
+}
+
+.closeBtn:hover {
+  background: var(--color-border);
+}
+
+.coords {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 20px 0;
+}
+
+.coordsLabel {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-secondary);
+}
+
+.coordsValue {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.form {
+  padding: 14px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+}
+
+.required {
+  color: var(--color-danger);
+}
+
+.optional {
+  font-weight: 400;
+  color: var(--color-text-secondary);
+}
+
+.input {
+  padding: 9px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  color: var(--color-text-primary);
+  outline: none;
+  transition: border-color var(--transition);
+  background: var(--color-card);
+  font-family: inherit;
+}
+
+.input:focus {
+  border-color: var(--color-border-focus);
+}
+
+.inputError {
+  border-color: var(--color-danger);
+}
+
+.inputReadonly {
+  background: var(--color-bg);
+  color: var(--color-text-secondary);
+  cursor: default;
+  font-variant-numeric: tabular-nums;
+}
+
+.inputReadonly:focus {
+  border-color: var(--color-border);
+}
+
+.coordRow {
+  display: flex;
+  gap: 8px;
+}
+
+.coordRow .input {
+  flex: 1;
+  min-width: 0;
+}
+
+.select {
+  padding: 9px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  color: var(--color-text-primary);
+  outline: none;
+  background: var(--color-card);
+  transition: border-color var(--transition);
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.select:focus {
+  border-color: var(--color-border-focus);
+}
+
+.errorMsg {
+  font-size: 12px;
+  color: var(--color-danger);
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  padding-top: 4px;
+}
+
+.cancelBtn {
+  flex: 1;
+  padding: 11px 0;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 600;
+  background: var(--color-bg);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+  transition: background var(--transition);
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.cancelBtn:hover {
+  background: var(--color-border);
+}
+
+/* 위시리스트 전용 저장 버튼 — 파란 계열 */
+.saveBtn {
+  flex: 2;
+  padding: 11px 0;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 700;
+  background: #3B82F6;
+  color: #fff;
+  border: none;
+  transition: background var(--transition);
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.saveBtn:hover {
+  background: #2563EB;
+}

@@ -1,16 +1,35 @@
 import { useState, useRef } from 'react'
 import { useObstacles } from './hooks/useObstacles'
 import { useDrawing } from './hooks/useDrawing'
+import { useWishlist } from './hooks/useWishlist'
 import Header from './components/Header'
 import FilterBar from './components/FilterBar'
 import Map from './components/Map'
 import MarkerList from './components/MarkerList'
 import ObstacleForm from './components/ObstacleForm'
+import WishlistForm from './components/WishlistForm'
+import WishlistList from './components/WishlistList'
+import WishlistDetail from './components/WishlistDetail'
 import styles from './App.module.css'
 
 export default function App() {
   const { obstacles, addObstacle, updateObstacle, removeObstacle } = useObstacles()
   const { drawMode, coords, setDrawMode, addCoord, undoCoord, resetDrawing } = useDrawing()
+  const {
+    items: wishlistItems,
+    selectedItem: selectedWishlistItem,
+    isFormOpen: isWishlistFormOpen,
+    formPosition: wishlistFormPosition,
+    handleMapClick: handleWishlistMapClick,
+    saveItem: saveWishlistItem,
+    deleteItem: deleteWishlistItem,
+    selectItem: selectWishlistItem,
+    closeForm: closeWishlistForm,
+    closeDetail: closeWishlistDetail,
+    incrementVisit,
+    addReview,
+  } = useWishlist()
+  const [activeMode, setActiveMode] = useState('obstacle')
   const [selectedCategories, setSelectedCategories] = useState([])
   const [selectedDangerLevels, setSelectedDangerLevels] = useState([])
   const [formState, setFormState] = useState(null)
@@ -27,6 +46,10 @@ export default function App() {
   })
 
   function handleMapClick({ lat, lng }) {
+    if (activeMode === 'wishlist') {
+      handleWishlistMapClick({ lat, lng })
+      return
+    }
     if (drawMode === 'point') {
       setFormState({ mode: 'create', lat, lng })
       setActiveMarkerId(null)
@@ -112,24 +135,38 @@ export default function App() {
   return (
     <div className={styles.app}>
       <Header
-        count={obstacles.length}
+        count={activeMode === 'wishlist' ? wishlistItems.length : obstacles.length}
         onToggleSidebar={() => setIsSidebarOpen((p) => !p)}
+        activeMode={activeMode}
+        onModeChange={setActiveMode}
       />
       <div className={styles.body}>
         <aside className={`${styles.sidebar} ${isSidebarOpen ? styles.open : ''}`}>
-          <FilterBar
-            selectedCategories={selectedCategories}
-            selectedDangerLevels={selectedDangerLevels}
-            obstacles={obstacles}
-            onCategoryChange={setSelectedCategories}
-            onDangerLevelChange={setSelectedDangerLevels}
-          />
-          <MarkerList
-            obstacles={filteredObstacles}
-            activeMarkerId={activeMarkerId}
-            onSelect={handleSelectFromList}
-            onDelete={handleDeleteObstacle}
-          />
+          {activeMode === 'wishlist' ? (
+            <WishlistList
+              items={wishlistItems}
+              onItemClick={(id) => {
+                selectWishlistItem(id)
+                setIsSidebarOpen(false)
+              }}
+            />
+          ) : (
+            <>
+              <FilterBar
+                selectedCategories={selectedCategories}
+                selectedDangerLevels={selectedDangerLevels}
+                obstacles={obstacles}
+                onCategoryChange={setSelectedCategories}
+                onDangerLevelChange={setSelectedDangerLevels}
+              />
+              <MarkerList
+                obstacles={filteredObstacles}
+                activeMarkerId={activeMarkerId}
+                onSelect={handleSelectFromList}
+                onDelete={handleDeleteObstacle}
+              />
+            </>
+          )}
         </aside>
 
         {isSidebarOpen && (
@@ -156,6 +193,8 @@ export default function App() {
           onDrawComplete={handleDrawComplete}
           onDrawUndo={undoCoord}
           onDrawCancel={handleDrawCancel}
+          wishlistItems={wishlistItems}
+          onWishlistItemClick={selectWishlistItem}
         />
 
         <div className={`${styles.bottomSheet} ${isSheetOpen ? styles.sheetOpen : ''}`}>
@@ -164,22 +203,38 @@ export default function App() {
             onClick={() => setIsSheetOpen((p) => !p)}
           >
             <span className={styles.handle} />
-            <span>{obstacles.length}개 장애물</span>
+            <span>
+              {activeMode === 'wishlist'
+                ? `${wishlistItems.length}곳 위시리스트`
+                : `${obstacles.length}개 장애물`}
+            </span>
           </button>
           <div className={styles.sheetContent}>
-            <FilterBar
-              selectedCategories={selectedCategories}
-              selectedDangerLevels={selectedDangerLevels}
-              obstacles={obstacles}
-              onCategoryChange={setSelectedCategories}
-              onDangerLevelChange={setSelectedDangerLevels}
-            />
-            <MarkerList
-              obstacles={filteredObstacles}
-              activeMarkerId={activeMarkerId}
-              onSelect={handleSelectFromList}
-              onDelete={handleDeleteObstacle}
-            />
+            {activeMode === 'wishlist' ? (
+              <WishlistList
+                items={wishlistItems}
+                onItemClick={(id) => {
+                  selectWishlistItem(id)
+                  setIsSheetOpen(false)
+                }}
+              />
+            ) : (
+              <>
+                <FilterBar
+                  selectedCategories={selectedCategories}
+                  selectedDangerLevels={selectedDangerLevels}
+                  obstacles={obstacles}
+                  onCategoryChange={setSelectedCategories}
+                  onDangerLevelChange={setSelectedDangerLevels}
+                />
+                <MarkerList
+                  obstacles={filteredObstacles}
+                  activeMarkerId={activeMarkerId}
+                  onSelect={handleSelectFromList}
+                  onDelete={handleDeleteObstacle}
+                />
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -189,6 +244,24 @@ export default function App() {
           formState={formState}
           onSave={handleSave}
           onClose={() => setFormState(null)}
+        />
+      )}
+
+      {isWishlistFormOpen && wishlistFormPosition && (
+        <WishlistForm
+          position={wishlistFormPosition}
+          onSave={saveWishlistItem}
+          onCancel={closeWishlistForm}
+        />
+      )}
+
+      {selectedWishlistItem && (
+        <WishlistDetail
+          item={selectedWishlistItem}
+          onVisit={incrementVisit}
+          onAddReview={addReview}
+          onDelete={deleteWishlistItem}
+          onClose={closeWishlistDetail}
         />
       )}
     </div>

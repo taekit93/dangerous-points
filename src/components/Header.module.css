@@ -52,10 +52,64 @@
   letter-spacing: -0.02em;
 }
 
+/* 모드 전환 탭 */
+.tabs {
+  display: flex;
+  gap: 2px;
+  background: rgba(255,255,255,0.12);
+  border-radius: var(--radius-full);
+  padding: 3px;
+  flex: 1;
+  max-width: 200px;
+  margin: 0 4px;
+}
+
+.tab {
+  flex: 1;
+  padding: 5px 10px;
+  border-radius: var(--radius-full);
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.7);
+  transition: all var(--transition);
+  white-space: nowrap;
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+}
+
+.tab:hover {
+  color: rgba(255,255,255,0.9);
+}
+
+.tabActive {
+  background: var(--color-card);
+  color: var(--color-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+/* 위시리스트 탭 활성 — 파란 계열 강조 */
+.tabWish {
+  color: #3B82F6;
+}
+
 .count {
   font-size: 13px;
   font-weight: 600;
   background: rgba(255,255,255,0.15);
   padding: 3px 10px;
   border-radius: var(--radius-full);
+  white-space: nowrap;
+}
+
+/* 모바일: 브랜드 텍스트 숨겨 탭 공간 확보 */
+@media (max-width: 480px) {
+  .brandText {
+    display: none;
+  }
+  .tabs {
+    max-width: none;
+    flex: 1;
+  }
 }
