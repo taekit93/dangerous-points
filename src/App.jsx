@@ -11,6 +11,7 @@ import GeoJsonImportModal from './components/GeoJsonImportModal'
 import WishlistForm from './components/WishlistForm'
 import WishlistList from './components/WishlistList'
 import WishlistDetail from './components/WishlistDetail'
+import { flyToObstacle } from './utils/flyToObstacle'
 import styles from './App.module.css'
 
 export default function App() {
@@ -132,8 +133,18 @@ export default function App() {
   }
 
   function handleSelectFromList(id) {
-    handleMarkerClick(id)
+    const obstacle = obstacles.find((o) => o.id === id)
+    if (obstacle && mapRef.current) {
+      flyToObstacle(mapRef.current, obstacle)
+    }
     setIsSheetOpen(false)
+  }
+
+  function handleFlyToWishlistItem(id) {
+    const item = wishlistItems.find((i) => i.id === id)
+    if (item && mapRef.current) {
+      mapRef.current.panTo(new window.naver.maps.LatLng(item.lat, item.lng))
+    }
   }
 
   function handleCloseInfoWindow() {
@@ -159,7 +170,7 @@ export default function App() {
             <WishlistList
               items={wishlistItems}
               onItemClick={(id) => {
-                selectWishlistItem(id)
+                handleFlyToWishlistItem(id)
                 setIsSidebarOpen(false)
               }}
             />
@@ -228,7 +239,7 @@ export default function App() {
               <WishlistList
                 items={wishlistItems}
                 onItemClick={(id) => {
-                  selectWishlistItem(id)
+                  handleFlyToWishlistItem(id)
                   setIsSheetOpen(false)
                 }}
               />
