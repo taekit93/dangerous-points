@@ -60,16 +60,20 @@ cd {worktreePath}
 </Success_Criteria>
 
 <Screenshot_Verification>
-executor가 저장한 UI 스크린샷의 존재 여부를 검증한다.
+`pipeline.json의 hasUI === true`일 때만 이 섹션을 적용한다.
+`hasUI === false`이면 스크린샷 검증 섹션 전체를 건너뛴다.
+
+`hasUI === true`인 경우, executor가 저장한 UI 스크린샷의 존재 여부를 검증한다.
 verifier는 스크린샷을 직접 캡처하지 않는다 — 캡처 책임은 executor에 있다.
 
 **검증 대상:**
 - features.md P0 항목별 최소 1개 스크린샷 파일 존재
 
-**검증 경로:** `{worktreePath}/execution/screenshots/{feature-name}.png`
+**검증 경로:** `{projectRoot}/{worktreePath}/{taskPath}/execution/screenshots/{feature-name}.png`
+(예: `.worktrees/hasUI-flag/tasks/2026-04-17-bar/execution/screenshots/feature.png`)
 
 **검증 항목:**
-1. `execution/screenshots/` 디렉토리 존재 여부
+1. `{taskPath}/execution/screenshots/` 디렉토리 존재 여부
 2. P0 기능명과 스크린샷 파일명 대응 여부
 3. 파일 크기 0 bytes 여부 (빈 파일 거부)
 

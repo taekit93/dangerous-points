@@ -180,8 +180,25 @@ worktree 생성 직후 .harness/pipeline.json 초기 기록:
   "worktreePath": ".worktrees/{task-name}",
   "worktreeBranch": "task/{yyyy-MM-dd}-{task-name}",
   "includeDesign": false,
+  "hasUI": false,
   "verified": false
 }
+
+**`hasUI` 판별 규칙:**
+- `hasUI: true` 조건 (하나라도 해당하면):
+  - 화면/UI 컴포넌트 추가·수정
+  - CSS/스타일 변경
+  - 시각적 버그 수정
+  - HTML 템플릿 변경
+- `hasUI: false` 조건 (모두 해당해야):
+  - 백엔드 로직 전용
+  - 설정 파일 전용
+  - 문서 전용
+  - 테스트 코드 전용
+
+`hasUI`는 `includeDesign`과 독립적인 플래그다.
+`includeDesign`은 designer 에이전트 삽입 여부를 제어하고,
+`hasUI`는 executor의 스크린샷 캡처 의무 여부를 제어한다.
 
 Final_Approval_Gate 승인 후 stage를 "execute" (또는 "design")로 업데이트한다.
 </Pipeline_State>
