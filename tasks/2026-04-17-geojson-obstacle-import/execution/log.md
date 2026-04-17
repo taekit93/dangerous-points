@@ -129,3 +129,11 @@ dist/assets/index-*.js     202.28 kB │ gzip: 63.23 kB
 - P0 기능 7종 전량 커버 확인
 
 최종 판정: verified = true. stage: commit으로 전환.
+
+## [Commit] 10:11 — git-master
+커밋 생성 완료.
+
+- 해시: c88ab06
+- 브랜치: task/2026-04-17-geojson-obstacle-import
+- 파일: 32 files changed, 3890 insertions(+), 8 deletions(-)
+- 메시지: feat(geojson): GeoJSON 직접 입력/파일 업로드로 장애물 일괄 등록
