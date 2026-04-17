@@ -92,10 +92,40 @@ E2E 테스트 파일이 없으면 구현이 완료된 것으로 인정하지 않
 **저장 경로:** `{projectRoot}/{worktreePath}/{taskPath}/execution/screenshots/{feature-name}.png`
 (예: `.worktrees/hasUI-flag/tasks/2026-04-17-bar/execution/screenshots/feature.png`)
 
-**캡처 방법 (우선순위 순):**
-1. Playwright 단독 스크립트: `npx playwright screenshot {url} --full-page {path}`
-2. Puppeteer 스크립트: `page.screenshot({ path: '...', fullPage: true })`
-3. 위 방법 모두 불가 시 → execution/log.md에 사유를 기록하고 생략 허용
+**캡처 절차 (hasUI === true일 때만 실행):**
+
+1. Playwright 설치 확인
+   `npx playwright --version 2>/dev/null`
+   - 성공(exit 0): 설치됨, 다음 단계 진행
+   - 실패: `npm install --save-dev playwright` 실행 후 `npx playwright install chromium` 실행
+
+2. Dev 서버 구동
+   - package.json의 scripts 확인: "dev" 키 → "start" 키 순서로 탐색
+   - 감지한 스크립트를 백그라운드로 실행: `npm run dev &` (또는 `npm run start &`)
+   - `SERVER_PID=$!` 로 PID 저장
+   - **예외 처리:**
+     - package.json이 없는 경우 → execution/log.md에 "package.json 미존재, 스크린샷 생략" 기록 후 캡처 단계 전체 생략
+     - scripts에 "dev"도 "start"도 없는 경우 → execution/log.md에 "dev/start 스크립트 미존재, 스크린샷 생략" 기록 후 캡처 단계 전체 생략
+     - 포트 점유 등 서버 구동 실패 시 → 기존 서버를 그대로 사용하거나, 재사용 불가 시 execution/log.md에 "서버 구동 실패: {사유}, 스크린샷 생략" 기록 후 캡처 단계 전체 생략
+
+3. 서버 ready 대기
+   - 기본 URL: `http://localhost:3000` (package.json의 포트 설정 있으면 그 값 사용)
+   - curl 폴링: `until curl -s {url} > /dev/null; do sleep 1; done` (타임아웃 30초)
+   - 30초 내 응답 없으면 서버 종료 후 오류 보고
+
+4. 스크린샷 캡처
+   - 저장 경로: `{projectRoot}/{worktreePath}/{taskPath}/execution/screenshots/{feature-name}.png`
+   - 실행: `npx playwright screenshot --full-page {url} {저장경로}`
+   - features.md P0 항목별 최소 1장
+
+5. Dev 서버 종료
+   - `kill $SERVER_PID`
+   - 서버 프로세스 정상 종료 확인
+
+**최종 fallback:**
+위 단계 중 어느 단계에서든 실패하는 경우(오프라인 환경, 권한 부족, 설치 실패 등)
+→ execution/log.md에 실패 단계와 사유를 기록하고 스크린샷 캡처를 생략한다.
+스크린샷 생략은 작업 완료를 막지 않는다.
 
 **캡처 후:**
 - execution/log.md에 스크린샷 경로 목록을 기록
