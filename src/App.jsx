@@ -7,13 +7,14 @@ import FilterBar from './components/FilterBar'
 import Map from './components/Map'
 import MarkerList from './components/MarkerList'
 import ObstacleForm from './components/ObstacleForm'
+import GeoJsonImportModal from './components/GeoJsonImportModal'
 import WishlistForm from './components/WishlistForm'
 import WishlistList from './components/WishlistList'
 import WishlistDetail from './components/WishlistDetail'
 import styles from './App.module.css'
 
 export default function App() {
-  const { obstacles, addObstacle, updateObstacle, removeObstacle } = useObstacles()
+  const { obstacles, addObstacle, addObstacles, updateObstacle, removeObstacle } = useObstacles()
   const { drawMode, coords, setDrawMode, addCoord, undoCoord, resetDrawing } = useDrawing()
   const {
     items: wishlistItems,
@@ -36,6 +37,7 @@ export default function App() {
   const [activeMarkerId, setActiveMarkerId] = useState(null)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [isSheetOpen, setIsSheetOpen] = useState(false)
+  const [showGeoJsonModal, setShowGeoJsonModal] = useState(false)
   const mapRef = useRef(null)
   const markersRef = useRef({})
 
@@ -138,6 +140,10 @@ export default function App() {
     setActiveMarkerId(null)
   }
 
+  function handleGeoJsonImport(importedObstacles) {
+    addObstacles(importedObstacles)
+  }
+
   return (
     <div className={styles.app}>
       <Header
@@ -145,6 +151,7 @@ export default function App() {
         onToggleSidebar={() => setIsSidebarOpen((p) => !p)}
         activeMode={activeMode}
         onModeChange={handleActiveMode}
+        onGeoJsonImport={() => setShowGeoJsonModal(true)}
       />
       <div className={styles.body}>
         <aside className={`${styles.sidebar} ${isSidebarOpen ? styles.open : ''}`}>
@@ -253,6 +260,12 @@ export default function App() {
           onClose={() => setFormState(null)}
         />
       )}
+
+      <GeoJsonImportModal
+        isOpen={showGeoJsonModal}
+        onClose={() => setShowGeoJsonModal(false)}
+        onImport={handleGeoJsonImport}
+      />
 
       {isWishlistFormOpen && wishlistFormPosition && (
         <WishlistForm

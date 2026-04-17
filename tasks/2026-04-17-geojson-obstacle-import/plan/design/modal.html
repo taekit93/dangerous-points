@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GeoJSON 가져오기 모달 — 목업</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* ── 목업 전용: 배경 맵 시뮬레이션 ── */
+    .map-bg {
+      position: fixed;
+      inset: 0;
+      background:
+        repeating-linear-gradient(0deg, transparent, transparent 39px, #d8dde5 39px, #d8dde5 40px),
+        repeating-linear-gradient(90deg, transparent, transparent 39px, #d8dde5 39px, #d8dde5 40px);
+      background-color: #e8ecf0;
+      z-index: 0;
+    }
+    .app-shell {
+      position: relative;
+      z-index: 1;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .map-area {
+      flex: 1;
+      position: relative;
+    }
+    /* 상태 레이블 */
+    .state-badge {
+      position: fixed;
+      top: 72px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 5px 14px;
+      background: rgba(26,26,46,0.82);
+      color: #fff;
+      border-radius: 99px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      z-index: 900;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+
+<!-- 배경 지도 시뮬레이션 -->
+<div class="map-bg" aria-hidden="true"></div>
+
+<!-- 앱 쉘 -->
+<div class="app-shell">
+
+  <!-- 헤더 (기존 Header.jsx 기반) -->
+  <header class="app-header">
+    <!-- 햄버거 -->
+    <button style="display:flex;flex-direction:column;gap:4px;padding:6px;border-radius:4px;transition:background .2s;background:none;border:none;cursor:pointer;"
+            onmouseenter="this.style.background='rgba(255,255,255,0.1)'"
+            onmouseleave="this.style.background='none'"
+            aria-label="메뉴 열기">
+      <span style="display:block;width:18px;height:2px;background:#fff;border-radius:1px;"></span>
+      <span style="display:block;width:18px;height:2px;background:#fff;border-radius:1px;"></span>
+      <span style="display:block;width:18px;height:2px;background:#fff;border-radius:1px;"></span>
+    </button>
+
+    <div class="header-brand">
+      <span class="header-brand-icon">⚠</span>
+      <span class="header-brand-text">장애물 지도</span>
+    </div>
+
+    <!-- 모드 탭 -->
+    <div style="display:flex;gap:2px;background:rgba(255,255,255,0.12);border-radius:9999px;padding:3px;flex:1;max-width:200px;margin:0 4px;">
+      <button style="flex:1;padding:5px 10px;border-radius:9999px;font-size:13px;font-weight:600;color:#fff;background:rgba(255,255,255,0.95);color:#2D3E50;box-shadow:0 1px 3px rgba(0,0,0,0.08);border:none;cursor:pointer;">장애물</button>
+      <button style="flex:1;padding:5px 10px;border-radius:9999px;font-size:13px;font-weight:600;color:rgba(255,255,255,0.7);border:none;background:none;cursor:pointer;">위시리스트</button>
+    </div>
+
+    <span style="font-size:13px;font-weight:600;background:rgba(255,255,255,0.15);padding:3px 10px;border-radius:9999px;white-space:nowrap;color:#fff;">12개</span>
+
+    <!-- GeoJSON 가져오기 버튼 (신규 진입점) -->
+    <button class="header-import-btn" id="openModalBtn" onclick="showState('initial')">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M8 1v9M4 6l4 4 4-4M2 12h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      GeoJSON 가져오기
+    </button>
+  </header>
+
+  <div class="map-area"></div>
+</div>
+
+<!-- 상태 레이블 -->
+<div class="state-badge" id="stateBadge" style="display:none;"></div>
+
+<!-- ════════════════════════════════════════════
+     모달: GeoJSON 가져오기
+════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modalOverlay" style="display:none;" onclick="handleOverlayClick(event)">
+  <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+
+    <!-- 모달 헤더 -->
+    <div class="modal-header">
+      <h2 class="modal-title" id="modalTitle">
+        <span class="modal-title-icon" aria-hidden="true">
+          <!-- GeoJSON 아이콘 (SVG 인라인) -->
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8 1v9M4 6l4 4 4-4M2 12h12" stroke="#3B82F6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        GeoJSON 가져오기
+      </h2>
+      <button class="modal-close-btn" onclick="closeModal()" aria-label="닫기">✕</button>
+    </div>
+
+    <!-- 모달 바디 -->
+    <div class="modal-body">
+
+      <!-- ── 입력 탭 ── -->
+      <div class="input-tabs" role="tablist" aria-label="입력 방식 선택">
+        <button
+          class="input-tab active"
+          id="tab-text"
+          role="tab"
+          aria-selected="true"
+          aria-controls="panel-text"
+          onclick="switchTab('text')"
+        >텍스트 입력</button>
+        <button
+          class="input-tab"
+          id="tab-file"
+          role="tab"
+          aria-selected="false"
+          aria-controls="panel-file"
+          onclick="switchTab('file')"
+        >파일 업로드</button>
+      </div>
+
+      <!-- Tab 1: 텍스트 입력 -->
+      <div class="tab-panel active" id="panel-text" role="tabpanel" aria-labelledby="tab-text">
+        <textarea
+          class="geojson-textarea"
+          id="geojsonTextarea"
+          placeholder='GeoJSON을 여기에 붙여넣으세요.
+예시:
+{
+  "type": "FeatureCollection",
+  "features": [...]
+}'
+          aria-label="GeoJSON 텍스트 입력"
+          rows="7"
+        ></textarea>
+        <button class="parse-btn" onclick="handleParseClick()">파싱하기</button>
+      </div>
+
+      <!-- Tab 2: 파일 업로드 -->
+      <div class="tab-panel" id="panel-file" role="tabpanel" aria-labelledby="tab-file">
+
+        <!-- 드롭존 (파일 미선택 상태) -->
+        <div
+          class="dropzone"
+          id="dropzone"
+          tabindex="0"
+          role="button"
+          aria-label=".geojson 또는 .json 파일을 드래그하거나 클릭하여 선택"
+          onclick="simulateFileSelect()"
+          ondragover="this.classList.add('dragover')"
+          ondragleave="this.classList.remove('dragover')"
+          ondrop="this.classList.remove('dragover');simulateFileSelect()"
+        >
+          <div class="dropzone-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z" stroke="#6B7280" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <polyline points="14 2 14 8 20 8" stroke="#6B7280" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <span class="dropzone-label">파일을 드래그하거나 클릭하여 선택</span>
+          <span class="dropzone-sub">지원 형식</span>
+          <div style="display:flex;gap:6px;">
+            <span class="dropzone-ext">.geojson</span>
+            <span class="dropzone-ext">.json</span>
+          </div>
+          <button class="file-select-btn" onclick="simulateFileSelect();event.stopPropagation()">파일 선택</button>
+        </div>
+
+        <!-- 파일 선택 완료 상태 (초기엔 숨김) -->
+        <div class="file-selected-info" id="fileSelectedInfo" style="display:none;">
+          <span class="file-selected-icon" aria-hidden="true">✓</span>
+          <span class="file-selected-name" id="fileSelectedName">obstacles_gangnam.geojson</span>
+          <span class="file-selected-size" id="fileSelectedSize">3.2 KB</span>
+          <button class="file-remove-btn" onclick="removeFile()" aria-label="파일 제거">✕</button>
+        </div>
+
+      </div>
+
+      <!-- ── 파싱 결과 미리보기 (상태별) ── -->
+
+      <!-- 성공 상태 -->
+      <div class="parse-result success" id="parseResultSuccess" style="display:none;">
+        <div class="parse-result-inner">
+          <span class="parse-result-icon" aria-hidden="true">✓</span>
+          <div class="parse-result-text">
+            <div class="parse-result-headline">3개의 Feature 발견</div>
+            <div class="parse-result-chips">
+              <span class="parse-chip">
+                <span class="chip-dot chip-point" aria-hidden="true"></span>
+                Point 1개
+              </span>
+              <span class="parse-chip">
+                <span class="chip-dot chip-line" aria-hidden="true"></span>
+                LineString 1개
+              </span>
+              <span class="parse-chip">
+                <span class="chip-dot chip-polygon" aria-hidden="true"></span>
+                Polygon 1개
+              </span>
+            </div>
+            <div class="parse-result-detail" style="margin-top:5px;">
+              properties에서 자동 매핑: <strong>title</strong>, <strong>category</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 오류 상태 -->
+      <div class="parse-result error" id="parseResultError" style="display:none;">
+        <div class="parse-result-inner">
+          <span class="parse-result-icon" aria-hidden="true">✕</span>
+          <div class="parse-result-text">
+            <div class="parse-result-headline">JSON 파싱 오류</div>
+            <div class="parse-result-detail">
+              유효하지 않은 JSON 형식입니다. GeoJSON 텍스트를 확인해주세요.<br>
+              <code style="font-size:11px;background:rgba(255,68,68,0.08);padding:2px 5px;border-radius:3px;">SyntaxError: Unexpected token } at position 142</code>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 경고 상태 (지원 안되는 geometry 포함) -->
+      <div class="parse-result warning" id="parseResultWarning" style="display:none;">
+        <div class="parse-result-inner">
+          <span class="parse-result-icon" aria-hidden="true">⚠</span>
+          <div class="parse-result-text">
+            <div class="parse-result-headline">2개의 Feature 발견 (1개 제외됨)</div>
+            <div class="parse-result-chips">
+              <span class="parse-chip">
+                <span class="chip-dot chip-point" aria-hidden="true"></span>
+                Point 2개
+              </span>
+            </div>
+            <div class="parse-result-detail" style="margin-top:5px;">
+              <strong>MultiPolygon</strong> 1개는 지원하지 않아 제외되었습니다.<br>
+              지원 형식: Point, LineString, Polygon
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── 구분선 + 메타데이터 폼 (파싱 성공 시) ── -->
+      <div id="metaSection" style="display:none;">
+
+        <div class="section-divider">공통 메타데이터</div>
+
+        <div class="meta-form">
+
+          <!-- 제목 -->
+          <div class="field">
+            <label class="field-label" for="titleInput">
+              제목 <span class="field-required" aria-label="필수">*</span>
+            </label>
+            <input
+              class="field-input"
+              type="text"
+              id="titleInput"
+              placeholder="장애물 제목을 입력하세요"
+              value=""
+              aria-describedby="titleHint titleAutoNote"
+            />
+            <div class="field-hint" id="titleHint">
+              <span class="field-hint-icon" aria-hidden="true">↩</span>
+              properties.title 자동 매핑됨
+            </div>
+            <!-- Feature 여러 개일 때 표시되는 자동 생성 안내 -->
+            <div class="title-auto-note" id="titleAutoNote">
+              Feature가 여러 개이므로 제목이 비어 있으면 <strong>"가져온 장애물 1", "가져온 장애물 2"…</strong> 형식으로 자동 생성됩니다.
+            </div>
+          </div>
+
+          <!-- 카테고리 -->
+          <div class="field">
+            <label class="field-label" for="categorySelect">카테고리</label>
+            <select class="field-select" id="categorySelect" aria-describedby="categoryHint">
+              <option value="공사중">공사중</option>
+              <option value="도로파손">도로파손</option>
+              <option value="침수">침수</option>
+              <option value="낙석">낙석</option>
+              <option value="보행위험">보행위험</option>
+              <option value="기타">기타</option>
+              <option value="직접입력">직접 입력...</option>
+            </select>
+            <div class="field-hint" id="categoryHint">
+              <span class="field-hint-icon" aria-hidden="true">↩</span>
+              properties.category 자동 매핑됨
+            </div>
+            <!-- 직접 입력 필드 (숨김 상태) -->
+            <input
+              class="field-input"
+              type="text"
+              id="customCategoryInput"
+              placeholder="카테고리를 입력하세요"
+              style="display:none;margin-top:6px;"
+            />
+          </div>
+
+          <!-- 위험도 -->
+          <div class="field">
+            <div class="field-label" id="dangerLabel">
+              위험도 <span class="field-required" aria-label="필수">*</span>
+            </div>
+            <div class="danger-options" role="radiogroup" aria-labelledby="dangerLabel" aria-required="true">
+              <label
+                class="danger-option"
+                style="--level-color:#FF4444;--level-bg:#FFF0F0;"
+                aria-label="위험"
+              >
+                <input type="radio" name="dangerLevel" value="위험" />
+                <span class="danger-dot" style="background:#FF4444;" aria-hidden="true"></span>
+                위험
+              </label>
+              <label
+                class="danger-option"
+                style="--level-color:#FFA500;--level-bg:#FFF8E6;"
+                aria-label="주의"
+              >
+                <input type="radio" name="dangerLevel" value="주의" />
+                <span class="danger-dot" style="background:#FFA500;" aria-hidden="true"></span>
+                주의
+              </label>
+              <label
+                class="danger-option"
+                style="--level-color:#44BB44;--level-bg:#F0FFF0;"
+                aria-label="안전"
+              >
+                <input type="radio" name="dangerLevel" value="안전" />
+                <span class="danger-dot" style="background:#44BB44;" aria-hidden="true"></span>
+                안전
+              </label>
+            </div>
+            <span class="field-error-msg" id="dangerError" style="display:none;" role="alert">
+              ⚠ 위험도를 선택해 주세요.
+            </span>
+          </div>
+
+          <!-- 설명 -->
+          <div class="field">
+            <label class="field-label" for="descInput">설명</label>
+            <textarea
+              class="field-textarea"
+              id="descInput"
+              placeholder="상세 설명 (선택)"
+              rows="3"
+            ></textarea>
+          </div>
+
+        </div><!-- /meta-form -->
+      </div><!-- /metaSection -->
+
+    </div><!-- /modal-body -->
+
+    <!-- 모달 푸터 -->
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal()">취소</button>
+      <button class="btn-submit" id="submitBtn" disabled>
+        장애물 등록
+      </button>
+    </div>
+
+  </div><!-- /modal-panel -->
+</div><!-- /modal-overlay -->
+
+<!-- ════════════════════════════════════════════
+     데모 컨트롤 (HTML 목업 상태 전환)
+════════════════════════════════════════════ -->
+<div class="demo-controls" aria-label="목업 상태 전환 (데모 전용)">
+  <span class="demo-label">목업 상태</span>
+  <button class="demo-btn" onclick="showState('initial')">① 초기 (텍스트 탭)</button>
+  <button class="demo-btn" onclick="showState('file-tab')">② 파일 업로드 탭</button>
+  <button class="demo-btn" onclick="showState('file-selected')">③ 파일 선택됨</button>
+  <button class="demo-btn" onclick="showState('parse-success')">④ 파싱 성공</button>
+  <button class="demo-btn" onclick="showState('parse-error')">⑤ 파싱 오류</button>
+  <button class="demo-btn" onclick="showState('parse-warning')">⑥ 경고 (Multi 제외)</button>
+  <button class="demo-btn" onclick="showState('meta-filled')">⑦ 메타 입력 완료</button>
+  <button class="demo-btn" onclick="closeModal()" style="background:#555;">✕ 모달 닫기</button>
+</div>
+
+<!-- ════════════════════════════════════════════
+     스크립트 (목업 인터랙션)
+════════════════════════════════════════════ -->
+<script>
+  /* ── 유틸 ── */
+  function show(id) { const el = document.getElementById(id); if (el) el.style.display = ''; }
+  function hide(id) { const el = document.getElementById(id); if (el) el.style.display = 'none'; }
+  function block(id) { const el = document.getElementById(id); if (el) el.style.display = 'flex'; }
+
+  /* ── 탭 전환 ── */
+  function switchTab(tab) {
+    const tabs = ['text', 'file'];
+    tabs.forEach(t => {
+      const btn = document.getElementById('tab-' + t);
+      const panel = document.getElementById('panel-' + t);
+      if (t === tab) {
+        btn.classList.add('active');
+        btn.setAttribute('aria-selected', 'true');
+        panel.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+        btn.setAttribute('aria-selected', 'false');
+        panel.classList.remove('active');
+      }
+    });
+  }
+
+  /* ── 모달 열기/닫기 ── */
+  function openModal() {
+    const overlay = document.getElementById('modalOverlay');
+    overlay.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    const overlay = document.getElementById('modalOverlay');
+    overlay.style.display = 'none';
+    document.body.style.overflow = '';
+    hide('stateBadge');
+  }
+
+  function handleOverlayClick(e) {
+    if (e.target === e.currentTarget) closeModal();
+  }
+
+  /* ── 파일 선택 시뮬레이션 ── */
+  function simulateFileSelect() {
+    showState('file-selected');
+  }
+
+  function removeFile() {
+    hide('fileSelectedInfo');
+    show('dropzone');
+    hideAllResults();
+    hide('metaSection');
+    document.getElementById('submitBtn').disabled = true;
+    document.getElementById('submitBtn').textContent = '장애물 등록';
+  }
+
+  /* ── 파싱 버튼 클릭 ── */
+  function handleParseClick() {
+    const text = document.getElementById('geojsonTextarea').value.trim();
+    if (!text) {
+      alert('GeoJSON 텍스트를 입력해 주세요.');
+      return;
+    }
+    // 목업이므로 항상 성공으로 시뮬레이션
+    showState('parse-success');
+  }
+
+  /* ── 파싱 결과 숨기기 ── */
+  function hideAllResults() {
+    hide('parseResultSuccess');
+    hide('parseResultError');
+    hide('parseResultWarning');
+  }
+
+  /* ── 라디오 선택 시 selected 클래스 ── */
+  document.addEventListener('change', function(e) {
+    if (e.target.name === 'dangerLevel') {
+      document.querySelectorAll('.danger-option').forEach(el => el.classList.remove('selected'));
+      e.target.closest('.danger-option').classList.add('selected');
+      hide('dangerError');
+      updateSubmitBtn();
+    }
+  });
+
+  /* ── 카테고리 직접입력 ── */
+  document.getElementById('categorySelect')?.addEventListener('change', function() {
+    const custom = document.getElementById('customCategoryInput');
+    custom.style.display = this.value === '직접입력' ? 'block' : 'none';
+  });
+
+  /* ── 제출 버튼 텍스트/상태 업데이트 ── */
+  function updateSubmitBtn(count) {
+    const btn = document.getElementById('submitBtn');
+    const c = count || window._featureCount || 0;
+    btn.textContent = c > 0 ? `${c}개 장애물 등록` : '장애물 등록';
+    btn.disabled = c === 0;
+  }
+
+  /* ════════════════════════════════════════════
+     showState: 목업 상태 전환 메인 함수
+  ════════════════════════════════════════════ */
+  function showState(state) {
+    openModal();
+    hideAllResults();
+    hide('metaSection');
+    hide('fileSelectedInfo');
+    show('dropzone');
+    document.getElementById('submitBtn').disabled = true;
+    document.getElementById('submitBtn').textContent = '장애물 등록';
+    document.querySelectorAll('.danger-option').forEach(el => el.classList.remove('selected'));
+    document.querySelectorAll('input[name=dangerLevel]').forEach(el => el.checked = false);
+    hide('dangerError');
+
+    const badge = document.getElementById('stateBadge');
+    badge.style.display = 'block';
+
+    const states = {
+      'initial':        { label: '상태 ①: 초기 상태 (텍스트 탭)', tab: 'text' },
+      'file-tab':       { label: '상태 ②: 파일 업로드 탭', tab: 'file' },
+      'file-selected':  { label: '상태 ③: 파일 선택됨', tab: 'file' },
+      'parse-success':  { label: '상태 ④: 파싱 성공 → 메타폼 표시', tab: 'text' },
+      'parse-error':    { label: '상태 ⑤: JSON 파싱 오류', tab: 'text' },
+      'parse-warning':  { label: '상태 ⑥: 경고 (Multi geometry 제외)', tab: 'text' },
+      'meta-filled':    { label: '상태 ⑦: 메타데이터 입력 완료 → 등록 가능', tab: 'text' },
+    };
+
+    const s = states[state] || { label: state, tab: 'text' };
+    badge.textContent = s.label;
+    switchTab(s.tab);
+
+    if (state === 'initial') {
+      document.getElementById('geojsonTextarea').value = '';
+    }
+
+    if (state === 'file-tab') {
+      // 드롭존만 보임
+    }
+
+    if (state === 'file-selected') {
+      switchTab('file');
+      hide('dropzone');
+      block('fileSelectedInfo');
+      document.getElementById('fileSelectedName').textContent = 'obstacles_gangnam.geojson';
+      document.getElementById('fileSelectedSize').textContent = '3.2 KB';
+    }
+
+    if (state === 'parse-success' || state === 'parse-warning') {
+      const isSuccess = state === 'parse-success';
+      const count = isSuccess ? 3 : 2;
+      window._featureCount = count;
+
+      if (isSuccess) {
+        block('parseResultSuccess');
+        document.getElementById('geojsonTextarea').value = JSON.stringify({
+          type: "FeatureCollection",
+          features: [
+            { type:"Feature", geometry:{type:"Point",coordinates:[126.9780,37.5665]}, properties:{title:"강남 싱크홀",category:"도로파손"} },
+            { type:"Feature", geometry:{type:"LineString",coordinates:[[126.978,37.566],[126.979,37.567]]}, properties:{title:"공사 구간",category:"공사중"} },
+            { type:"Feature", geometry:{type:"Polygon",coordinates:[[[126.98,37.568],[126.981,37.569],[126.982,37.568],[126.98,37.568]]]}, properties:{} }
+          ]
+        }, null, 2);
+      } else {
+        block('parseResultWarning');
+      }
+
+      show('metaSection');
+      document.getElementById('titleInput').value = isSuccess ? '' : '';
+      document.getElementById('submitBtn').disabled = true;
+      document.getElementById('submitBtn').textContent = `${count}개 장애물 등록`;
+
+      // 자동 매핑 힌트 표시
+      show('titleHint');
+      show('categoryHint');
+      show('titleAutoNote');
+    }
+
+    if (state === 'parse-error') {
+      block('parseResultError');
+      hide('metaSection');
+    }
+
+    if (state === 'meta-filled') {
+      window._featureCount = 3;
+      block('parseResultSuccess');
+      show('metaSection');
+
+      document.getElementById('geojsonTextarea').value = '{ "type": "FeatureCollection", "features": [...] }';
+      document.getElementById('titleInput').value = '';
+      document.getElementById('categorySelect').value = '공사중';
+
+      // 위험도 선택 시뮬레이션
+      const warningRadio = document.querySelector('input[name="dangerLevel"][value="주의"]');
+      if (warningRadio) {
+        warningRadio.checked = true;
+        warningRadio.closest('.danger-option').classList.add('selected');
+      }
+
+      document.getElementById('descInput').value = '강남구 공사 구간 일대 장애물 3건. 2026-04-17 수동 수집.';
+      document.getElementById('submitBtn').disabled = false;
+      document.getElementById('submitBtn').textContent = '3개 장애물 등록';
+    }
+  }
+
+  /* ── 키보드 접근성: ESC 닫기 ── */
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeModal();
+  });
+</script>
+
+</body>
+</html>

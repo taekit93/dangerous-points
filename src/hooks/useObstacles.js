@@ -21,5 +21,11 @@ export function useObstacles() {
     setObstacles((prev) => prev.filter((o) => o.id !== id))
   }
 
-  return { obstacles, addObstacle, updateObstacle, removeObstacle }
+  function addObstacles(list) {
+    const newItems = storage.createBatch(list)
+    setObstacles((prev) => [...prev, ...newItems])
+    return newItems
+  }
+
+  return { obstacles, addObstacle, addObstacles, updateObstacle, removeObstacle }
 }

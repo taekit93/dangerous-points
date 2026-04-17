@@ -103,6 +103,28 @@
   white-space: nowrap;
 }
 
+/* GeoJSON 가져오기 버튼 */
+.importBtn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-on-primary);
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.25);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background var(--transition);
+  font-family: inherit;
+}
+
+.importBtn:hover {
+  background: rgba(255,255,255,0.25);
+}
+
 /* 모바일: 브랜드 텍스트 숨겨 탭 공간 확보 */
 @media (max-width: 480px) {
   .brandText {
@@ -111,5 +133,8 @@
   .tabs {
     max-width: none;
     flex: 1;
+  }
+  .importBtnText {
+    display: none;
   }
 }

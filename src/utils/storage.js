@@ -37,6 +37,19 @@ export function create(data) {
   return newItem
 }
 
+export function createBatch(dataList) {
+  const items = load()
+  const now = new Date().toISOString()
+  const newItems = dataList.map((data) => ({
+    ...data,
+    id: generateUUID(),
+    createdAt: now,
+    updatedAt: now,
+  }))
+  save([...items, ...newItems])
+  return newItems
+}
+
 export function update(id, data) {
   const items = load()
   const updated = items.map((item) =>
