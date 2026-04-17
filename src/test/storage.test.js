@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { getAll, create, update, remove } from '../utils/storage'
+import { getAll, create, createBatch, update, remove } from '../utils/storage'
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/
 
@@ -44,6 +44,54 @@ describe('storage', () => {
       create({ title: 'a', lat: 1, lng: 2, category: '기타', dangerLevel: '안전', description: '' })
       create({ title: 'b', lat: 3, lng: 4, category: '공사중', dangerLevel: '위험', description: '' })
       expect(getAll()).toHaveLength(2)
+    })
+  })
+
+  describe('createBatch', () => {
+    it('여러 항목을 1회 로드/저장으로 일괄 생성한다', () => {
+      const items = createBatch([
+        { title: 'a', lat: 1, lng: 2, category: '기타', dangerLevel: '안전', description: '' },
+        { title: 'b', lat: 3, lng: 4, category: '공사중', dangerLevel: '위험', description: '' },
+      ])
+      expect(items).toHaveLength(2)
+      expect(getAll()).toHaveLength(2)
+    })
+
+    it('각 항목에 id, createdAt, updatedAt을 자동으로 추가한다', () => {
+      const [item] = createBatch([
+        { title: 'batch-item', lat: 37.5, lng: 126.9, category: '기타', dangerLevel: '주의', description: '' },
+      ])
+      expect(item.id).toBeDefined()
+      expect(item.createdAt).toBeDefined()
+      expect(item.updatedAt).toBeDefined()
+      expect(item.title).toBe('batch-item')
+    })
+
+    it('생성된 모든 항목의 id가 고유하다', () => {
+      const count = 10
+      const items = createBatch(
+        Array.from({ length: count }, (_, i) => ({
+          title: `item-${i}`, lat: i, lng: i, category: '기타', dangerLevel: '안전', description: '',
+        }))
+      )
+      const ids = new Set(items.map((item) => item.id))
+      expect(ids.size).toBe(count)
+    })
+
+    it('빈 배열을 전달하면 빈 배열을 반환하고 기존 항목은 유지된다', () => {
+      create({ title: 'existing', lat: 1, lng: 2, category: '기타', dangerLevel: '안전', description: '' })
+      const result = createBatch([])
+      expect(result).toEqual([])
+      expect(getAll()).toHaveLength(1)
+    })
+
+    it('기존 항목이 있을 때 배치 항목이 추가된다', () => {
+      create({ title: 'existing', lat: 1, lng: 2, category: '기타', dangerLevel: '안전', description: '' })
+      createBatch([
+        { title: 'new1', lat: 3, lng: 4, category: '기타', dangerLevel: '주의', description: '' },
+        { title: 'new2', lat: 5, lng: 6, category: '기타', dangerLevel: '위험', description: '' },
+      ])
+      expect(getAll()).toHaveLength(3)
     })
   })
 
